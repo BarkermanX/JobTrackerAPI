@@ -1,0 +1,22 @@
+# Node / React
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+
+# .NET
+backend/**/bin/
+backend/**/obj/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# .NET user secrets
+**/appsettings.Development.json
+
+# OS
+.DS_Store
+Thumbs.db
