@@ -1,22 +1,38 @@
 # Node / React
-frontend/node_modules/
-frontend/dist/
-frontend/.env
-frontend/.env.*
-!frontend/.env.example
+JobTrackerUI/node_modules/
+JobTrackerUI/dist/
+JobTrackerUI/.env
+JobTrackerUI/.env.*
+!JobTrackerUI/.env.example
 
 # .NET
-backend/**/bin/
-backend/**/obj/
+JobTrackerAPI/**/bin/
+JobTrackerAPI/**/obj/
+JobTrackerAPI/**/*.user
+JobTrackerAPI/**/*.suo
+JobTrackerAPI/**/*.userosscache
+JobTrackerAPI/**/*.sln.docstates
+JobTrackerAPI/**/appsettings.Development.json
 
-# Visual Studio
+# Logs / generated output
+*.log
+coverage/
+*.coverage
+TestResults/
+VCAP
+
+# Visual Studio / IDE
 .vs/
-*.user
-*.suo
-
-# .NET user secrets
-**/appsettings.Development.json
+.vscode/
+*.code-workspace
 
 # OS
 .DS_Store
 Thumbs.db
+
+# local database / temp
+*.mdf
+*.ldf
+*.db
+*.sqlite
+*.sqlite3
