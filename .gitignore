@@ -4,6 +4,7 @@ JobTrackerUI/dist/
 JobTrackerUI/.env
 JobTrackerUI/.env.*
 !JobTrackerUI/.env.example
+!JobTrackerUI/.env.production
 
 # .NET
 JobTrackerAPI/**/bin/
