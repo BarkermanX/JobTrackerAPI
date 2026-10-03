@@ -30,6 +30,12 @@ The project currently includes:
 - a React + Vite frontend with login and protected dashboard screens
 - basic auth flow and API access patterns for future CRUD features
 
+## Azure
+
+- Database hosted and accessible of Azure ✅
+- .NET Web API hosted on Azure and can talk to the hosted Azure database ✅
+- Static React front end hosted and talking to the .NET Azure hosted Web API ✅
+
 ## Architecture
 
 ```text
