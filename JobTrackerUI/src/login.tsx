@@ -133,8 +133,10 @@ function Login() {
 
                 <p>The frontend is built with <strong>React/Vite</strong>, with an <strong>ASP.NET Core Web API</strong> backend using C#, Entity Framework Core and SQL Server. The application is hosted on Azure using an <strong>Azure Static Web App</strong> for the frontend, <strong>Azure App Service</strong> for the API and <strong>Azure SQL Database</strong> for the data.</p>
 
-                <p>The project is deployed from GitHub using <strong>GitHub Actions</strong>, with JWT authentication, secure HTTP-only cookies, refresh tokens and role/policy-based authorisation.</p>
+                <p>The project uses <strong>GitHub Actions CI/CD pipelines</strong> to build, test and deploy the application automatically from GitHub.</p>
 
+                <p>Authentication uses JWTs, secure HTTP-only cookies, refresh tokens and role/policy-based authorisation.</p>
+                
                 <p>It runs on the Azure free tiers, so you may occasionally see a cold start or slightly slower response while the services wake up.</p>
 
                 <p>There are also a few placeholders for functionality I may add in the future, including integrating with a job-search API.</p>
