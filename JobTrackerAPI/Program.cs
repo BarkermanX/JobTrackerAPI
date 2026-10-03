@@ -16,6 +16,11 @@ builder.Services.AddControllers();
 
 // Dependency Injections
 builder.Services.AddScoped<IPersonnelService, PersonnelService>();
+builder.Services.AddHttpClient<IAdzunaJobSearchService, AdzunaJobSearchService>(client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(15);
+});
+builder.Logging.AddFilter("System.Net.Http.HttpClient", LogLevel.Warning);
 builder.Services.AddDbContext<PersonnelDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")));

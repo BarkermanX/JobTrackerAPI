@@ -28,6 +28,7 @@ The project currently includes:
 - seeded user/personnel data
 - CORS configuration for a React frontend
 - a React + Vite frontend with login and protected dashboard screens
+- an authenticated Adzuna job-search proxy with debounced dashboard results
 - basic auth flow and API access patterns for future CRUD features
 
 ## Azure
@@ -52,6 +53,10 @@ JobTrackerAPI/
 
 JobTrackerUI/
 ├── src/
+│   └── components/dashboard/
+│       ├── DashboardLayout.tsx
+│       ├── DashboardOverview.tsx
+│       └── AdzunaJobSearch.tsx
 ├── public/
 ├── package.json
 ├── vite.config.ts
@@ -143,6 +148,16 @@ This value is used by Vite to proxy requests to the backend API.
 ## Environment configuration
 
 The API reads configuration from `appsettings.json` and the environment-specific settings file. The UI expects a `VITE_API_URL` environment variable to point at the running API.
+
+Adzuna job search is proxied through the authenticated API so provider credentials are not exposed to the browser. Register for Adzuna API credentials and configure these API settings using user secrets locally or application settings in Azure:
+
+```text
+Adzuna__AppId
+Adzuna__AppKey
+Adzuna__CountryCode=gb
+```
+
+The dashboard automatically searches UK listings after a job title or keyword is entered. Searches are debounced while typing; location is optional. Without the app ID and key, the API returns a configuration message and job results remain unavailable.
 
 ## Current features summary
 
