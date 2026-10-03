@@ -7,6 +7,27 @@ The repository contains two main parts:
 - JobTrackerAPI — a .NET Web API for authentication, data access, and application logic
 - JobTrackerUI — a React + TypeScript frontend for interacting with the API
 
+# Let's Have a Look Then!
+
+**[Open the live demo](https://yellow-glacier-0d69f4c0f.5.azurestaticapps.net/dashboard)**
+
+**Demo login**
+
+* **Username:** `user1`
+* **Password:** `password`
+
+### Safari User Issues (iPhone/Mac)
+
+The demo works on Safari, but Safari's **Prevent cross-site tracking** setting can prevent the authentication cookie from being accepted because the frontend and API are hosted on separate Azure domains.
+
+If login doesn't work in Safari:
+
+**Safari → Settings → Privacy → untick "Prevent cross-site tracking"**
+
+Then reload the demo and log in again.
+
+The application is currently running on the **Azure Free tier**. Azure's Static Web App API proxy, which would allow the frontend and API to use the same domain and avoid this Safari issue, requires the **Standard** tier. I'm keeping the project on the Free tier for now to keep costs down and looking into bearer tokens.
+
 ## Project goal
 
 The long-term goal is to build a practical dashboard for:
