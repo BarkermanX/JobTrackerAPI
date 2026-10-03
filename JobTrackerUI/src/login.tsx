@@ -2,6 +2,7 @@ import { useState, type SubmitEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
 import "./login.css";
+import { apiFetch } from "./api";
 
 function Login() {
   const navigate = useNavigate();
@@ -14,7 +15,7 @@ function Login() {
     event.preventDefault();
 
     try {
-      const response = await fetch("/api/Auth/login", {
+      const response = await apiFetch("/api/Auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
