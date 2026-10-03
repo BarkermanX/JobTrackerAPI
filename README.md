@@ -32,9 +32,9 @@ The project currently includes:
 
 ## Azure
 
-- Database hosted and accessible of Azure [x]
-- .NET Web API hosted on Azure and can talk to the hosted Azure database [x]
-- Static React front end hosted and talking to the .NET Azure hosted Web API [x]
+- Database hosted and accessible of Azure ✅
+- .NET Web API hosted on Azure and can talk to the hosted Azure database ✅
+- Static React front end hosted and talking to the .NET Azure hosted Web API ✅
 
 ## Architecture
 
