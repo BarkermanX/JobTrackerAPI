@@ -40,27 +40,7 @@
             string strAccessToken = GenerateAccessToken(objUser);
             var strRefreshToken = GenerateRefreshToken(objUser, Guid.NewGuid());
 
-            Response.Cookies.Append(
-                "accessToken",
-                strAccessToken,
-                new CookieOptions
-                {
-                    HttpOnly = true,
-                    Secure = true,
-                    SameSite = SameSiteMode.Lax,
-                    Expires = DateTimeOffset.UtcNow.AddMinutes(30)
-                });
-
-            Response.Cookies.Append(
-                "refreshToken",
-                strRefreshToken,
-                new CookieOptions
-                {
-                    HttpOnly = true,
-                    Secure = true,
-                    SameSite = SameSiteMode.Lax,
-                    Expires = DateTimeOffset.UtcNow.AddDays(7)
-                });
+            craeatAndAddCookies(strAccessToken, strRefreshToken);
 
             return Ok();
         }
@@ -117,27 +97,7 @@
             var strNewAccessToken = GenerateAccessToken(user);
             var strRefreshToken = GenerateRefreshToken(user, storedToken.TokenFamilyId);
 
-            Response.Cookies.Append(
-                "accessToken",
-                strNewAccessToken,
-                new CookieOptions
-                {
-                    HttpOnly = true,
-                    Secure = true,
-                    SameSite = SameSiteMode.Lax,
-                    Expires = DateTimeOffset.UtcNow.AddMinutes(30)
-                });
-
-            Response.Cookies.Append(
-                "refreshToken",
-                strRefreshToken,
-                new CookieOptions
-                {
-                    HttpOnly = true,
-                    Secure = true,
-                    SameSite = SameSiteMode.Lax,
-                    Expires = DateTimeOffset.UtcNow.AddDays(7)
-                });
+            craeatAndAddCookies(strNewAccessToken, strRefreshToken);
 
             return Ok();
         }
@@ -251,6 +211,32 @@
             var hash = sha256.ComputeHash(bytes);
 
             return Convert.ToBase64String(hash);
+        }
+
+        private void craeatAndAddCookies(string strAccessToken, string strRefreshToken)
+        {
+            Response.Cookies.Append(
+               "accessToken",
+               strAccessToken,
+               new CookieOptions
+               {
+                   HttpOnly = true,
+                   Secure = true,
+                   SameSite = SameSiteMode.None,
+                   Expires = DateTimeOffset.UtcNow.AddMinutes(30)
+               });
+
+            Response.Cookies.Append(
+                "refreshToken",
+                strRefreshToken,
+                new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.None,
+                    Expires = DateTimeOffset.UtcNow.AddDays(7)
+                });
+
         }
     }
 }

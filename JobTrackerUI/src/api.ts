@@ -15,11 +15,21 @@ async function refreshSession(): Promise<boolean> {
   return refreshPromise;
 }
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export async function apiFetch(
   input: RequestInfo | URL,
   init?: RequestInit
 ): Promise<Response> {
-  const response = await fetch(input, init);
+  const url =
+    typeof input === "string" && input.startsWith("/")
+      ? `${API_URL}${input}`
+      : input;
+
+  const response = await fetch(url, {
+    ...init,
+    credentials: "include",
+  });
 
   if (response.status !== 401) {
     return response;
@@ -31,5 +41,8 @@ export async function apiFetch(
     return response;
   }
 
-  return fetch(input, init);
+  return fetch(url, {
+    ...init,
+    credentials: "include",
+  });
 }
