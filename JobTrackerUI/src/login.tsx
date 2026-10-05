@@ -2,7 +2,6 @@ import { useState, type SubmitEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
 import "./login.css";
-import { apiFetch } from "./api";
 
 function Login() {
   const navigate = useNavigate();
@@ -16,28 +15,12 @@ function Login() {
     event.preventDefault();
 
     try {
-      const response = await apiFetch("/api/Auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username,
-          password,
-        }),
-      });
-
-      if (!response.ok) {
-        console.log("Login failed");
-        return;
-      }
-
-      console.log("Login successful");
-
-      const authenticated = await login();
+      const authenticated = await login(username, password);
 
       if (authenticated) {
         navigate("/dashboard");
+      }else {
+        console.log("Login failed");
       }
     } catch (error) {
       console.error("Login error:", error);

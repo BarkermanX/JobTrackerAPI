@@ -6,7 +6,7 @@ import {
   type ReactNode,
 } from "react";
 
-import { apiFetch } from "./api";
+import { apiFetch, setAccessToken } from "./api";
 
 interface User {
   username: string;
@@ -17,7 +17,7 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: () => Promise<boolean>;
+  login: (username: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
 }
 
@@ -55,26 +55,51 @@ export function AuthProvider({ children }: AuthProviderProps) {
     checkAuthentication();
   }, []);
 
-  const login = async () => {
+  const login = async (
+    username: string,
+    password: string
+  ): Promise<boolean> => {
     try {
-        const response = await apiFetch("/api/Auth/me");
+      const response = await apiFetch("/api/Auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username,
+          password,
+        }),
+      });
 
-        if (!response.ok) {
+      if (!response.ok) {
         setUser(null);
         return false;
-        }
+      }
 
-        const data: User = await response.json();
+      const data = await response.json();
 
-        setUser(data);
+      setAccessToken(data.accessToken);
 
-        return true;
+      const meResponse = await apiFetch("/api/Auth/me");
+
+      if (!meResponse.ok) {
+        setAccessToken(null);
+        setUser(null);
+        return false;
+      }
+
+      const user: User = await meResponse.json();
+
+      setUser(user);
+
+      return true;
     } catch (error) {
-        console.error("Authentication check failed:", error);
-        setUser(null);
-        return false;
+      console.error("Login failed:", error);
+      setAccessToken(null);
+      setUser(null);
+      return false;
     }
-    };
+  };
 
   const logout = async () => {
     try {
@@ -87,6 +112,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         return;
       }
 
+      setAccessToken(null);
       setUser(null);
     } catch (error) {
       console.error("Logout error:", error);

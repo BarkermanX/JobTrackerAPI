@@ -40,9 +40,12 @@
             string strAccessToken = GenerateAccessToken(objUser);
             var strRefreshToken = GenerateRefreshToken(objUser, Guid.NewGuid());
 
-            craeatAndAddCookies(strAccessToken, strRefreshToken);
+            createRefreshCookie(strRefreshToken);
 
-            return Ok();
+            return Ok(new
+            {
+                accessToken = strAccessToken
+            });
         }
 
         [HttpPost("refresh")]
@@ -97,9 +100,12 @@
             var strNewAccessToken = GenerateAccessToken(user);
             var strRefreshToken = GenerateRefreshToken(user, storedToken.TokenFamilyId);
 
-            craeatAndAddCookies(strNewAccessToken, strRefreshToken);
+            createRefreshCookie(strRefreshToken);
 
-            return Ok();
+            return Ok(new
+            {
+                accessToken = strNewAccessToken
+            });
         }
 
         private string GenerateAccessToken(User user)
@@ -182,7 +188,6 @@
 
             context.SaveChanges();
 
-            Response.Cookies.Delete("accessToken");
             Response.Cookies.Delete("refreshToken");
 
             return Ok();
@@ -213,19 +218,8 @@
             return Convert.ToBase64String(hash);
         }
 
-        private void craeatAndAddCookies(string strAccessToken, string strRefreshToken)
+        private void createRefreshCookie(string strRefreshToken)
         {
-            Response.Cookies.Append(
-               "accessToken",
-               strAccessToken,
-               new CookieOptions
-               {
-                   HttpOnly = true,
-                   Secure = true,
-                   SameSite = SameSiteMode.None,
-                   Expires = DateTimeOffset.UtcNow.AddMinutes(30)
-               });
-
             Response.Cookies.Append(
                 "refreshToken",
                 strRefreshToken,

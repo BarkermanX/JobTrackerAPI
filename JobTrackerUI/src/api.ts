@@ -1,21 +1,38 @@
+const API_URL = import.meta.env.VITE_API_URL;
+
 let refreshPromise: Promise<boolean> | null = null;
+let accessToken: string | null = null;
+
+export function setAccessToken(token: string | null) {
+  accessToken = token;
+}
 
 async function refreshSession(): Promise<boolean> {
   if (!refreshPromise) {
-    refreshPromise = fetch("/api/Auth/refresh", {
+    refreshPromise = fetch(`${API_URL}/api/Auth/refresh`, {
       method: "POST",
+      credentials: "include",
     })
-      .then((response) => response.ok)
+      .then(async (response) => {
+        if (!response.ok) {
+          return false;
+        }
+
+        const data = await response.json();
+
+        accessToken = data.accessToken;
+
+        return true;
+      })
       .catch(() => false)
       .finally(() => {
         refreshPromise = null;
       });
   }
 
+
   return refreshPromise;
 }
-
-const API_URL = import.meta.env.VITE_API_URL;
 
 export async function apiFetch(
   input: RequestInfo | URL,
@@ -26,8 +43,15 @@ export async function apiFetch(
       ? `${API_URL}${input}`
       : input;
 
+  const headers = new Headers(init?.headers);
+
+  if (accessToken) {
+    headers.set("Authorization", `Bearer ${accessToken}`);
+  }
+
   const response = await fetch(url, {
     ...init,
+    headers,
     credentials: "include",
   });
 
@@ -41,8 +65,15 @@ export async function apiFetch(
     return response;
   }
 
+  const retryHeaders = new Headers(init?.headers);
+
+  if (accessToken) {
+    retryHeaders.set("Authorization", `Bearer ${accessToken}`);
+  }
+
   return fetch(url, {
     ...init,
+    headers: retryHeaders,
     credentials: "include",
   });
 }
