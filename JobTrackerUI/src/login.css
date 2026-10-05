@@ -187,6 +187,8 @@
 }
 
 .login-panel {
+  position: relative;
+  z-index: 2;
   display: grid;
   place-items: center;
   padding: clamp(32px, 7vw, 88px);
@@ -359,8 +361,10 @@
 }
 
 .project-note {
+  position: relative;
+  z-index: 1;
   margin-top: 24px;
-  overflow: hidden;
+  overflow: visible;
   border: 1px solid #e9e5ef;
   border-radius: 12px;
   background: #fbfaff;
@@ -368,6 +372,7 @@
 }
 
 .project-note.is-expanded {
+  z-index: 5;
   border-color: #d8cbed;
   background: #f9f7fd;
 }
@@ -434,7 +439,19 @@
 }
 
 .project-note-details {
-  padding: 0 15px 14px 55px;
+  position: absolute;
+  z-index: 10;
+  bottom: calc(100% + 8px);
+  right: 0;
+  width: min(620px, calc(100vw - 48px));
+  max-height: min(60svh, 520px);
+  box-sizing: border-box;
+  overflow-y: auto;
+  padding: 18px 22px;
+  border: 1px solid #ded5ed;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 18px 48px rgba(25, 17, 43, 0.25);
   color: #686270;
   font-size: 12px;
   line-height: 1.65;
@@ -525,6 +542,12 @@
 
   .api-wakeup-countdown {
     white-space: normal;
+  }
+
+  .project-note-details {
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%);
   }
 }
 
