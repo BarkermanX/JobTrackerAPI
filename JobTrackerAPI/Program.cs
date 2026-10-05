@@ -181,15 +181,15 @@ builder.Services.AddOpenApi(options =>
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
+//using (var scope = app.Services.CreateScope())
+//{
+//    var services = scope.ServiceProvider;
 
-    var context = services.GetRequiredService<PersonnelDbContext>();
-    var passwordHasher = services.GetRequiredService<IPasswordHasher<User>>();
+//    var context = services.GetRequiredService<PersonnelDbContext>();
+//    var passwordHasher = services.GetRequiredService<IPasswordHasher<User>>();
 
-    SeedData.Initialize(context, passwordHasher);
-}
+//    SeedData.Initialize(context, passwordHasher);
+//}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
