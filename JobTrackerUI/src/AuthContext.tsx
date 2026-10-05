@@ -61,10 +61,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   ): Promise<boolean> => {
     try {
 
-      console.log("LOGIN:", {
-        username,
-        passwordLength: password?.length,
-      });
+      
 
       const response = await apiFetch("/api/Auth/login", {
         method: "POST",

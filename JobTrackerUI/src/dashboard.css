@@ -1714,6 +1714,229 @@
   color: #555164;
 }
 
+.expectations-edit-button {
+  min-height: 29px;
+  padding: 0 10px;
+  border: 1px solid #d9ccef;
+  border-radius: 7px;
+  background: #f3edfc;
+  color: #563594;
+  font: inherit;
+  font-size: 9px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease;
+}
+
+.expectations-edit-button:hover {
+  border-color: #bca8e1;
+  background: #ebe2f9;
+}
+
+.expectations-summary-message,
+.expectations-summary-error {
+  margin-top: 20px;
+  color: #716a81;
+  font-size: 10px;
+}
+
+.expectations-summary-error,
+.expectations-form-error {
+  color: #a04450;
+}
+
+.expectations-form-container {
+  margin-top: 15px;
+}
+
+.expectations-form {
+  display: grid;
+  gap: 14px;
+}
+
+.expectations-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.expectations-form-field {
+  min-width: 0;
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  color: #4e495e;
+  font-size: 9px;
+  font-weight: 650;
+}
+
+.expectations-form-field > span {
+  line-height: 1.4;
+}
+
+.expectations-form-field input {
+  width: 100%;
+  min-width: 0;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid #e3deec;
+  border-radius: 7px;
+  outline: none;
+  background: #fdfcff;
+  color: #353044;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 450;
+}
+
+.expectations-form-field input:focus {
+  border-color: #9274cd;
+  box-shadow: 0 0 0 3px rgba(121, 82, 216, 0.12);
+}
+
+.expectations-form-field input::placeholder {
+  color: #aaa5b4;
+}
+
+.expectations-form-field small {
+  color: #898397;
+  font-size: 8px;
+  font-weight: 450;
+}
+
+.expectations-form-wide {
+  grid-column: 1 / -1;
+}
+
+.expectations-input-suffix,
+.expectations-input-prefix {
+  min-width: 0;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  border: 1px solid #e3deec;
+  border-radius: 7px;
+  background: #fdfcff;
+}
+
+.expectations-input-suffix:focus-within,
+.expectations-input-prefix:focus-within {
+  border-color: #9274cd;
+  box-shadow: 0 0 0 3px rgba(121, 82, 216, 0.12);
+}
+
+.expectations-input-suffix input,
+.expectations-input-prefix input {
+  height: 34px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.expectations-input-suffix > span {
+  padding-right: 9px;
+  color: #898397;
+  font-size: 8px;
+  font-weight: 450;
+}
+
+.expectations-input-prefix > span {
+  padding-left: 10px;
+  color: #6b568f;
+  font-size: 10px;
+}
+
+.expectations-remote-field {
+  grid-column: 1 / -1;
+  padding: 10px;
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  border: 1px solid #ebe6f2;
+  border-radius: 8px;
+  background: #faf8fd;
+  cursor: pointer;
+}
+
+.expectations-remote-field > input {
+  width: 14px;
+  height: 14px;
+  margin: 1px 0 0;
+  accent-color: #6846c1;
+}
+
+.expectations-remote-field strong,
+.expectations-remote-field small {
+  display: block;
+}
+
+.expectations-remote-field strong {
+  color: #4f4a60;
+  font-size: 9px;
+  font-weight: 650;
+}
+
+.expectations-remote-field small {
+  margin-top: 2px;
+  color: #898397;
+  font-size: 8px;
+}
+
+.expectations-form-error,
+.expectations-form-success {
+  margin: 0;
+  font-size: 9px;
+}
+
+.expectations-form-success {
+  color: #3e7958;
+}
+
+.expectations-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.expectations-form-actions button {
+  min-height: 33px;
+  padding: 0 11px;
+  border-radius: 7px;
+  font: inherit;
+  font-size: 9px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.expectations-form-actions button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.expectations-cancel-button {
+  border: 1px solid #e1dce9;
+  background: #fff;
+  color: #6e687c;
+}
+
+.expectations-save-button {
+  border: 1px solid #5b3b9e;
+  background: #6241aa;
+  color: #fff;
+}
+
+.expectations-save-button:hover:not(:disabled) {
+  background: #4f328f;
+}
+
+.expectations-form-message {
+  margin: 18px 0;
+  color: #716a81;
+  font-size: 10px;
+}
+
 .profile-empty p,
 .table-empty p,
 .compact-empty p,
@@ -1800,6 +2023,16 @@
 
   .funnel-stage small {
     font-size: 8px;
+  }
+
+  .expectations-form-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .expectations-form-wide,
+  .expectations-remote-field {
+    grid-column: auto;
   }
 
   .topbar-meta {

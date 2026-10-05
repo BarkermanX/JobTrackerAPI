@@ -143,11 +143,18 @@ From the JobTrackerAPI directory:
 
 ```bash
 dotnet restore
+dotnet ef database update
 dotnet build
 dotnet run
 ```
 
-The API is configured for development and exposes Swagger/OpenAPI in development mode.
+Configure the API's SQL Server connection string before applying migrations. The API is configured for development and exposes Swagger/OpenAPI in development mode.
+
+### Job expectations
+
+Each authenticated user can save one job-expectations profile covering job titles, company size/values/culture preferences, location, commute time, salary range, and remote preference. The dashboard loads this profile and allows it to be edited; after saving, it reloads the profile from the API so the displayed values reflect persisted data.
+
+The API exposes authenticated `GET` and `PUT` endpoints at `/api/JobExpectations`. Apply the `AddJobExpectations` migration before using these endpoints against a database.
 
 ### 2. Configure and run the UI
 

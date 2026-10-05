@@ -1,10 +1,44 @@
+import { useEffect, useState } from "react";
+import JobExpectationsForm from "../JobExpectationsForm";
+import {
+  getJobExpectations,
+  type JobExpectations,
+} from "../../api/jobExpectationsApi";
+
 interface DashboardOverviewProps {
   username: string;
 }
 
 function DashboardOverview({ username }: DashboardOverviewProps) {
+  const [expectations, setExpectations] = useState<JobExpectations | null>(null);
+  const [expectationsLoading, setExpectationsLoading] = useState(true);
+  const [expectationsError, setExpectationsError] = useState("");
+  const [editingExpectations, setEditingExpectations] = useState(false);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    getJobExpectations(controller.signal)
+      .then(setExpectations)
+      .catch((error: unknown) => {
+        if (controller.signal.aborted) return;
+        console.error("Unable to load dashboard job expectations:", error);
+        setExpectationsError(error instanceof Error
+          ? error.message
+          : "Unable to load your job expectations.");
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setExpectationsLoading(false);
+      });
+
+    return () => controller.abort();
+  }, []);
+
   const hour = new Date().getHours();
   const timeOfDay = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+  const salaryRange = expectations
+    ? `${new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", maximumFractionDigits: 0 }).format(expectations.minimumSalary)} – ${new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", maximumFractionDigits: 0 }).format(expectations.maximumSalary)}`
+    : "";
 
   return (
     <>
@@ -105,23 +139,55 @@ function DashboardOverview({ username }: DashboardOverviewProps) {
               <span className="card-icon card-icon-lilac" aria-hidden="true">◎</span>
               <div><h2>Job expectations</h2><p>What matters in your next role</p></div>
             </div>
-            <span className="coming-soon">PROFILE</span>
+            <button
+              className="expectations-edit-button"
+              type="button"
+              aria-expanded={editingExpectations}
+              aria-controls="job-expectations-form"
+              onClick={() => setEditingExpectations(open => !open)}
+            >
+              {editingExpectations ? "Hide form" : "Edit expectations"}
+            </button>
           </div>
-          <div className="expectations-list">
-            <div className="expectation-item">
-              <span className="expectation-symbol" aria-hidden="true">⌕</span>
-              <span><small>POSITIONS & TITLES</small><strong>Add the roles you’re looking for</strong></span>
+          {editingExpectations ? (
+            <div id="job-expectations-form" className="expectations-form-container">
+              <JobExpectationsForm
+                onSaved={savedExpectations => {
+                  setExpectations(savedExpectations);
+                  setExpectationsError("");
+                }}
+                onCancel={() => setEditingExpectations(false)}
+              />
             </div>
-            <div className="expectation-item">
-              <span className="expectation-symbol" aria-hidden="true">⌖</span>
-              <span><small>LOCATION & COMMUTE</small><strong>Set your location and travel time</strong></span>
-            </div>
-            <div className="expectation-item">
-              <span className="expectation-symbol" aria-hidden="true">£</span>
-              <span><small>PAY & WORK STYLE</small><strong>Salary range, company size and values</strong></span>
-            </div>
-          </div>
-          <p className="card-footnote">Use your preferences to keep the right opportunities in focus.</p>
+          ) : (
+            <>
+              {expectationsLoading ? (
+                <p className="expectations-summary-message">Loading your saved expectations…</p>
+              ) : expectationsError ? (
+                <p className="expectations-summary-error" role="alert">{expectationsError}</p>
+              ) : expectations ? (
+                <div className="expectations-list">
+                  <div className="expectation-item">
+                    <span className="expectation-symbol" aria-hidden="true">⌕</span>
+                    <span><small>POSITIONS & TITLES</small><strong>{expectations.jobTitles.length > 0 ? expectations.jobTitles.join(", ") : "Add the roles you’re looking for"}</strong></span>
+                  </div>
+                  <div className="expectation-item">
+                    <span className="expectation-symbol" aria-hidden="true">⌖</span>
+                    <span><small>LOCATION & COMMUTE</small><strong>{expectations.location || "Set your location"} · {expectations.maxCommuteMinutes} min commute</strong></span>
+                  </div>
+                  <div className="expectation-item">
+                    <span className="expectation-symbol" aria-hidden="true">£</span>
+                    <span><small>PAY & WORK STYLE</small><strong>{salaryRange} · {expectations.remote ? "Remote included" : "On-site or hybrid"}</strong></span>
+                  </div>
+                  <div className="expectation-item">
+                    <span className="expectation-symbol" aria-hidden="true">✦</span>
+                    <span><small>COMPANY PREFERENCES</small><strong>{expectations.companyPreferences.length > 0 ? expectations.companyPreferences.join(", ") : "Set company size, values or culture preferences"}</strong></span>
+                  </div>
+                </div>
+              ) : null}
+              <p className="card-footnote">Use your preferences to keep the right opportunities in focus.</p>
+            </>
+          )}
         </article>
 
         <article className="dashboard-card" id="personal-details">

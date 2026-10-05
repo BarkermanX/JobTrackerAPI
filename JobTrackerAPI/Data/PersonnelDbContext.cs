@@ -15,10 +15,29 @@ namespace JobTrackerAPI.Data
             modelBuilder.Entity<Personnel>()
                 .HasIndex(p => new { p.Email, p.Reference })
                 .IsUnique();
+
+            modelBuilder.Entity<JobExpectation>()
+                .HasOne(expectation => expectation.User)
+                .WithOne(user => user.JobExpectation)
+                .HasForeignKey<JobExpectation>(expectation => expectation.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<JobExpectation>()
+                .Property(expectation => expectation.Location)
+                .HasMaxLength(120);
+
+            modelBuilder.Entity<JobExpectation>()
+                .Property(expectation => expectation.MinimumSalary)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<JobExpectation>()
+                .Property(expectation => expectation.MaximumSalary)
+                .HasPrecision(18, 2);
         }
 
         public DbSet<Personnel> Personnel { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<JobExpectation> JobExpectations { get; set; }
     }
 }
