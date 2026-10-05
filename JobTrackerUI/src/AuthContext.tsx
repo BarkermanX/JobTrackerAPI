@@ -17,11 +17,80 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (username: string, password: string) => Promise<boolean>;
+  login: (username: string, password: string, onApiWaking?: () => void) => Promise<boolean>;
   logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const LOGIN_RETRY_WINDOW_MS = 3 * 60 * 1000;
+const LOGIN_RETRY_DELAY_MS = 5000;
+const LOGIN_REQUEST_TIMEOUT_MS = 60000;
+
+function isTransientApiFailure(error: unknown): boolean {
+  return error instanceof TypeError ||
+    (error instanceof DOMException && error.name === "AbortError");
+}
+
+async function requestWhileApiWakes(
+  path: string,
+  init: RequestInit,
+  onApiWaking?: () => void,
+): Promise<Response> {
+  const startedAt = Date.now();
+  let hasReportedWakeUp = false;
+
+  while (true) {
+    const controller = new AbortController();
+    const timeout = window.setTimeout(
+      () => controller.abort(),
+      LOGIN_REQUEST_TIMEOUT_MS,
+    );
+
+    let response: Response | undefined;
+    let requestError: unknown;
+
+    try {
+      response = await apiFetch(path, { ...init, signal: controller.signal });
+    } catch (error) {
+      requestError = error;
+    } finally {
+      window.clearTimeout(timeout);
+    }
+
+    const transientResponse = response !== undefined &&
+      [502, 503, 504].includes(response.status);
+    const transientError = requestError !== undefined &&
+      isTransientApiFailure(requestError);
+
+    if (response !== undefined && !transientResponse) {
+      return response;
+    }
+
+    if (requestError !== undefined && !transientError) {
+      throw requestError;
+    }
+
+    if (!hasReportedWakeUp) {
+      hasReportedWakeUp = true;
+      onApiWaking?.();
+    }
+
+    const elapsed = Date.now() - startedAt;
+    if (elapsed >= LOGIN_RETRY_WINDOW_MS) {
+      throw new Error(
+        "The API hasn't responded yet. Please try again in a little while.",
+      );
+    }
+
+    if (response) {
+      await response.body?.cancel();
+    }
+
+    await new Promise<void>(resolve => {
+      window.setTimeout(resolve, Math.min(LOGIN_RETRY_DELAY_MS, LOGIN_RETRY_WINDOW_MS - elapsed));
+    });
+  }
+}
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -57,13 +126,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const login = async (
     username: string,
-    password: string
+    password: string,
+    onApiWaking?: () => void,
   ): Promise<boolean> => {
     try {
-
-      
-
-      const response = await apiFetch("/api/Auth/login", {
+      const response = await requestWhileApiWakes("/api/Auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -72,7 +139,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           username,
           password,
         }),
-      });
+      }, onApiWaking);
 
       if (!response.ok) {
         setUser(null);
@@ -83,7 +150,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       setAccessToken(data.accessToken);
 
-      const meResponse = await apiFetch("/api/Auth/me");
+      const meResponse = await requestWhileApiWakes(
+        "/api/Auth/me",
+        { method: "GET" },
+        onApiWaking,
+      );
 
       if (!meResponse.ok) {
         setAccessToken(null);
@@ -100,7 +171,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       console.error("Login failed:", error);
       setAccessToken(null);
       setUser(null);
-      return false;
+      throw error;
     }
   };
 

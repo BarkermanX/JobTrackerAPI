@@ -1,4 +1,4 @@
-import { useState, type SubmitEvent } from "react";
+import { useEffect, useState, type SubmitEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
 import "./login.css";
@@ -10,22 +10,48 @@ function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showProjectDetails, setShowProjectDetails] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [apiWaking, setApiWaking] = useState(false);
+  const [wakeElapsedSeconds, setWakeElapsedSeconds] = useState(0);
+  const [loginError, setLoginError] = useState("");
+
+  useEffect(() => {
+    if (!apiWaking) return;
+
+    const interval = window.setInterval(() => {
+      setWakeElapsedSeconds(seconds => seconds + 5);
+    }, 5000);
+
+    return () => window.clearInterval(interval);
+  }, [apiWaking]);
 
   const handleLogin = async (event: SubmitEvent) => {
     event.preventDefault();
+    setIsSubmitting(true);
+    setApiWaking(false);
+    setWakeElapsedSeconds(0);
+    setLoginError("");
 
     try {
-      const authenticated = await login(username, password);
+      const authenticated = await login(username, password, () => setApiWaking(true));
 
       if (authenticated) {
         navigate("/dashboard");
-      }else {
-        console.log("Login failed");
+      } else {
+        setLoginError("Username or password is incorrect.");
       }
     } catch (error) {
       console.error("Login error:", error);
+      setLoginError(error instanceof Error
+        ? error.message
+        : "Unable to sign in right now. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+      setApiWaking(false);
     }
   };
+
+  const estimatedSecondsRemaining = Math.max(0, 90 - wakeElapsedSeconds);
 
   return (
     <div className="login-page">
@@ -66,6 +92,7 @@ function Login() {
                   onChange={(event) => setUsername(event.target.value)}
                   placeholder="Enter your username"
                   autoComplete="username"
+                  disabled={isSubmitting}
                 />
               </div>
 
@@ -78,14 +105,43 @@ function Login() {
                   onChange={(event) => setPassword(event.target.value)}
                   placeholder="Enter your password"
                   autoComplete="current-password"
+                  disabled={isSubmitting}
                 />
               </div>
 
-              <button type="submit" className="login-button">
-                <span>Sign in</span>
-                <span className="button-arrow" aria-hidden="true">→</span>
+              <button type="submit" className="login-button" disabled={isSubmitting}>
+                <span>{isSubmitting ? "Signing in…" : "Sign in"}</span>
+                <span className="button-arrow" aria-hidden="true">{isSubmitting ? "…" : "→"}</span>
               </button>
             </form>
+
+            {isSubmitting && (
+              <div className="api-wakeup" role="status">
+                <span className="api-wakeup-spinner" aria-hidden="true" />
+                <div className="api-wakeup-copy">
+                  <strong>{apiWaking ? "The API is waking up" : "Connecting securely…"}</strong>
+                  {!apiWaking ? (
+                    <p>
+                      If the Azure free-tier API is asleep, it can take a little while to start.
+                      We’ll keep checking and finish signing you in automatically.
+                    </p>
+                  ) : estimatedSecondsRemaining > 0 ? (
+                    <p>
+                      Azure free-tier services often take around 30–90 seconds to wake.
+                      We’ll keep checking and sign you in automatically.
+                      <span className="api-wakeup-countdown"> About {estimatedSecondsRemaining}s left in that estimate.</span>
+                    </p>
+                  ) : (
+                    <p>
+                      It’s taking a little longer than usual. Startup can occasionally take a couple of minutes;
+                      we’re still checking and will continue your sign-in when it’s ready.
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {loginError && <p className="login-error" role="alert">{loginError}</p>}
 
             <aside className={`project-note${showProjectDetails ? " is-expanded" : ""}`}>
               <button

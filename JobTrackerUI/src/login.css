@@ -286,6 +286,11 @@
   box-shadow: 0 9px 20px rgba(23, 21, 29, 0.18);
 }
 
+.login-button:disabled {
+  cursor: wait;
+  opacity: 0.75;
+}
+
 .login-button:focus-visible {
   outline: 3px solid rgba(121, 82, 216, 0.45);
   outline-offset: 3px;
@@ -295,6 +300,62 @@
   font-size: 20px;
   font-weight: 400;
   line-height: 1;
+}
+
+.api-wakeup {
+  margin-top: 18px;
+  padding: 14px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  border: 1px solid #ded3f1;
+  border-radius: 12px;
+  background: #f8f5fd;
+  color: #4c3a70;
+}
+
+.api-wakeup-spinner {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 17px;
+  margin-top: 1px;
+  border: 2px solid #d9ccef;
+  border-top-color: #7952d8;
+  border-radius: 50%;
+  animation: api-wakeup-spin 800ms linear infinite;
+}
+
+.api-wakeup-copy strong {
+  display: block;
+  font-size: 12px;
+}
+
+.api-wakeup-copy p {
+  margin: 5px 0 0;
+  color: #6f6680;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.api-wakeup-countdown {
+  white-space: nowrap;
+}
+
+.login-error {
+  margin: 14px 0 0;
+  padding: 11px 13px;
+  border: 1px solid #f0c9ce;
+  border-radius: 10px;
+  background: #fff6f6;
+  color: #a33e4a;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+@keyframes api-wakeup-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .project-note {
@@ -390,6 +451,12 @@
   text-align: center;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .api-wakeup-spinner {
+    animation: none;
+  }
+}
+
 @media (max-width: 760px) {
   .login-page {
     padding: 14px;
@@ -454,6 +521,10 @@
 
   .login-footer {
     margin-top: 20px;
+  }
+
+  .api-wakeup-countdown {
+    white-space: normal;
   }
 }
 
