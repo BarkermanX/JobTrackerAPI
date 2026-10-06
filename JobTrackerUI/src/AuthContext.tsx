@@ -24,7 +24,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const LOGIN_RETRY_WINDOW_MS = 3 * 60 * 1000;
 const LOGIN_RETRY_DELAY_MS = 5000;
-const LOGIN_REQUEST_TIMEOUT_MS = 60000;
+const LOGIN_REQUEST_TIMEOUT_MS = 120000;
 
 function isTransientApiFailure(error: unknown): boolean {
   return error instanceof TypeError ||
