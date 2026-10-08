@@ -21,7 +21,7 @@ export default function JobExpectationsForm({
         maxCommuteMinutes: 30,
         minimumSalary: 50000,
         maximumSalary: 60000,
-        remote: true,
+        workArrangement: "All",
     });
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -152,7 +152,7 @@ export default function JobExpectationsForm({
                             }));
                             setSaved(false);
                         }}
-                        placeholder="Senior Software Developer, Product Designer"
+                        placeholder="Software Developer, Counselor, Nurse, etc."
                     />
                     <small>Separate multiple titles with commas.</small>
                 </label>
@@ -174,7 +174,7 @@ export default function JobExpectationsForm({
                             }));
                             setSaved(false);
                         }}
-                        placeholder="Small, ethical, mission-led"
+                        placeholder="Small/large, ethical, mission-led"
                     />
                     <small>Separate company size, values or culture preferences with commas.</small>
                 </label>
@@ -240,17 +240,31 @@ export default function JobExpectationsForm({
                     </div>
                 </label>
 
-                <label className="expectations-remote-field">
-                    <input
-                        name="remote"
-                        type="checkbox"
-                        checked={formData.remote}
-                        onChange={handleChange}
-                    />
-                    <span>
-                        <strong>Include remote roles</strong>
-                        <small>Show opportunities that support remote working.</small>
-                    </span>
+                <label className="expectations-form-field expectations-form-wide" htmlFor="workArrangement">
+                    <span>Work arrangement</span>
+                    <select
+                        id="workArrangement"
+                        name="workArrangement"
+                        value={formData.workArrangement}
+                        onChange={event => {
+                            const value = event.target.value;
+                            if (
+                                value !== "On-site" &&
+                                value !== "Remote" &&
+                                value !== "Hybrid" &&
+                                value !== "All"
+                            ) {
+                                return;
+                            }
+                            setFormData(previous => ({ ...previous, workArrangement: value }));
+                            setSaved(false);
+                        }}
+                    >
+                        <option value="On-site">On-site</option>
+                        <option value="Remote">Remote</option>
+                        <option value="Hybrid">Hybrid</option>
+                        <option value="All">All</option>
+                    </select>
                 </label>
             </div>
 

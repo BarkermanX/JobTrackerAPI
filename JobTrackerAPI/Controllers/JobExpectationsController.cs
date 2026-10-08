@@ -105,7 +105,7 @@ namespace JobTrackerAPI.Controllers
             expectation.MaxCommuteMinutes = request.MaxCommuteMinutes;
             expectation.MinimumSalary = request.MinimumSalary;
             expectation.MaximumSalary = request.MaximumSalary;
-            expectation.Remote = request.Remote;
+            expectation.WorkArrangement = request.WorkArrangement;
 
             await context.SaveChangesAsync(cancellationToken);
 
@@ -139,7 +139,7 @@ namespace JobTrackerAPI.Controllers
                 MaxCommuteMinutes = expectation.MaxCommuteMinutes,
                 MinimumSalary = expectation.MinimumSalary,
                 MaximumSalary = expectation.MaximumSalary,
-                Remote = expectation.Remote
+                WorkArrangement = expectation.WorkArrangement
             };
         }
     }

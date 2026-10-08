@@ -10,7 +10,7 @@ namespace JobTrackerAPI.Models
         public int MaxCommuteMinutes { get; set; }
         public decimal MinimumSalary { get; set; }
         public decimal MaximumSalary { get; set; }
-        public bool Remote { get; set; }
+        public string WorkArrangement { get; set; } = "All";
         public User? User { get; set; }
     }
 }

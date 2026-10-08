@@ -4,6 +4,11 @@ import {
   getJobExpectations,
   type JobExpectations,
 } from "../../api/jobExpectationsApi";
+import PersonalDetailsForm from "../PersonalDetailsForm";
+import {
+  getPersonalDetails,
+  type PersonalDetails,
+} from "../../api/personalDetailsApi";
 
 interface DashboardOverviewProps {
   username: string;
@@ -11,11 +16,15 @@ interface DashboardOverviewProps {
 
 function DashboardOverview({ username }: DashboardOverviewProps) {
   const [expectations, setExpectations] = useState<JobExpectations | null>(null);
+  const [personalDetails, setPersonalDetails] = useState<PersonalDetails | null>(null);
+  const [personalDetailsLoading, setPersonalDetailsLoading] = useState(true);
+  const [personalDetailsError, setPersonalDetailsError] = useState("");
   const [expectationsLoading, setExpectationsLoading] = useState(true);
   const [expectationsError, setExpectationsError] = useState("");
   const [editingExpectations, setEditingExpectations] = useState(false);
-  const [expectationsExpanded, setExpectationsExpanded] = useState(false);
-  const [personalDetailsExpanded, setPersonalDetailsExpanded] = useState(false);
+  const [editingPersonalDetails, setEditingPersonalDetails] = useState(false);
+  const [expectationsExpanded, setExpectationsExpanded] = useState(true);
+  const [personalDetailsExpanded, setPersonalDetailsExpanded] = useState(true);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -36,11 +45,39 @@ function DashboardOverview({ username }: DashboardOverviewProps) {
     return () => controller.abort();
   }, []);
 
+  useEffect(() => {
+    const controller = new AbortController();
+
+    getPersonalDetails(controller.signal)
+      .then(setPersonalDetails)
+      .catch((error: unknown) => {
+        if (controller.signal.aborted) return;
+        console.error("Unable to load dashboard personal details:", error);
+        setPersonalDetailsError(error instanceof Error
+          ? error.message
+          : "Unable to load your personal details.");
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setPersonalDetailsLoading(false);
+      });
+
+    return () => controller.abort();
+  }, []);
+
   const hour = new Date().getHours();
   const timeOfDay = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
   const salaryRange = expectations
     ? `${new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", maximumFractionDigits: 0 }).format(expectations.minimumSalary)} – ${new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", maximumFractionDigits: 0 }).format(expectations.maximumSalary)}`
     : "";
+  const hasSavedExpectations = expectations !== null && (
+    expectations.jobTitles.length > 0 ||
+    expectations.companyPreferences.length > 0 ||
+    expectations.location.length > 0 ||
+    expectations.maxCommuteMinutes !== 30 ||
+    expectations.minimumSalary !== 50000 ||
+    expectations.maximumSalary !== 60000 ||
+    expectations.workArrangement !== "All"
+  );
 
   return (
     <>
@@ -150,7 +187,18 @@ function DashboardOverview({ username }: DashboardOverviewProps) {
               <div><h2>Personal details</h2><p>Your professional introduction</p></div>
             </div>
             <div className="card-heading-actions">
-              <span className="coming-soon">PROFILE</span>
+              <button
+                className="expectations-edit-button"
+                type="button"
+                aria-expanded={editingPersonalDetails}
+                aria-controls="personal-details-form"
+                onClick={() => {
+                  setPersonalDetailsExpanded(true);
+                  setEditingPersonalDetails(editing => !editing);
+                }}
+              >
+                {editingPersonalDetails ? "Hide form" : "Edit details"}
+              </button>
               <button
                 className="card-collapse-button"
                 type="button"
@@ -163,17 +211,74 @@ function DashboardOverview({ username }: DashboardOverviewProps) {
               </button>
             </div>
           </div>
+          {!personalDetailsExpanded && !personalDetailsLoading && !personalDetailsError && personalDetails && (
+            <div className="personal-details-collapsed-summary" aria-label="Saved personal details">
+              {personalDetails.fullName && <strong>{personalDetails.fullName}</strong>}
+              {personalDetails.email && <span>{personalDetails.email}</span>}
+              {personalDetails.phone && <span>{personalDetails.phone}</span>}
+              {personalDetails.location && <span>{personalDetails.location}</span>}
+              {personalDetails.professionalSummary && (
+                <p>{personalDetails.professionalSummary}</p>
+              )}
+            </div>
+          )}
           <div id="personal-details-content" hidden={!personalDetailsExpanded}>
-            <div className="profile-empty">
-              <span className="profile-placeholder" aria-hidden="true">+</span>
-              <div>
-                <strong>Make it yours</strong>
-                <p>Add your contact details, preferred name and a short professional summary.</p>
+            {editingPersonalDetails ? (
+              <div id="personal-details-form" className="expectations-form-container">
+                <PersonalDetailsForm
+                  onSaved={details => {
+                    setPersonalDetails(details);
+                    setPersonalDetailsError("");
+                    setEditingPersonalDetails(false);
+                    setPersonalDetailsExpanded(false);
+                  }}
+                  onCancel={() => setEditingPersonalDetails(false)}
+                />
               </div>
-            </div>
-            <div className="profile-details-hint">
-              <span>CONTACT</span><span>LOCATION</span><span>ABOUT YOU</span>
-            </div>
+            ) : personalDetailsLoading ? (
+              <p className="expectations-summary-message">Loading your personal details…</p>
+            ) : personalDetailsError ? (
+              <p className="expectations-summary-error" role="alert">{personalDetailsError}</p>
+            ) : personalDetails && (
+              personalDetails.fullName ||
+              personalDetails.email ||
+              personalDetails.phone ||
+              personalDetails.location ||
+              personalDetails.professionalSummary
+            ) ? (
+              <div className="personal-details-summary">
+                <div className="personal-details-fields">
+                  {personalDetails.fullName && (
+                    <div><small>NAME</small><strong>{personalDetails.fullName}</strong></div>
+                  )}
+                  {personalDetails.email && (
+                    <div><small>EMAIL</small><strong><a href={`mailto:${personalDetails.email}`}>{personalDetails.email}</a></strong></div>
+                  )}
+                  {personalDetails.phone && (
+                    <div><small>PHONE</small><strong><a href={`tel:${personalDetails.phone}`}>{personalDetails.phone}</a></strong></div>
+                  )}
+                  {personalDetails.location && (
+                    <div><small>LOCATION</small><strong>{personalDetails.location}</strong></div>
+                  )}
+                </div>
+                {personalDetails.professionalSummary && (
+                  <p className="personal-professional-summary">{personalDetails.professionalSummary}</p>
+                )}
+              </div>
+            ) : (
+              <>
+                <div className="profile-empty">
+                  <span className="profile-placeholder" aria-hidden="true">+</span>
+                  <div>
+                    <strong>Make it yours</strong>
+                    <p>Add your contact details, preferred name and a short professional summary.</p>
+                  </div>
+                </div>
+                <div className="profile-details-hint">
+                  <span>CONTACT</span><span>LOCATION</span><span>ABOUT YOU</span>
+                </div>
+              </>
+            )}
           </div>
         </article>
 
@@ -216,6 +321,25 @@ function DashboardOverview({ username }: DashboardOverviewProps) {
               </button>
             </div>
           </div>
+          {!expectationsExpanded && !expectationsLoading && !expectationsError && hasSavedExpectations && expectations && (
+            <div className="expectations-collapsed-summary" aria-label="Saved job expectations summary">
+              {expectations.jobTitles.length > 0 && (
+                <span><strong>Roles</strong>{expectations.jobTitles.join(", ")}</span>
+              )}
+              {expectations.location && (
+                <span><strong>Location</strong>{expectations.location} · up to {expectations.maxCommuteMinutes} min commute</span>
+              )}
+              {(expectations.minimumSalary !== 50000 || expectations.maximumSalary !== 60000) && (
+                <span><strong>Pay</strong>{salaryRange}</span>
+              )}
+              {expectations.companyPreferences.length > 0 && (
+                <span><strong>Company</strong>{expectations.companyPreferences.join(", ")}</span>
+              )}
+              {expectations.workArrangement !== "All" && (
+                <span><strong>Work arrangement</strong>{expectations.workArrangement}</span>
+              )}
+            </div>
+          )}
           <div id="expectations-content" hidden={!expectationsExpanded}>
             {editingExpectations ? (
               <div id="job-expectations-form" className="expectations-form-container">
@@ -223,6 +347,8 @@ function DashboardOverview({ username }: DashboardOverviewProps) {
                   onSaved={savedExpectations => {
                     setExpectations(savedExpectations);
                     setExpectationsError("");
+                    setEditingExpectations(false);
+                    setExpectationsExpanded(false);
                   }}
                   onCancel={() => setEditingExpectations(false)}
                 />
@@ -245,7 +371,7 @@ function DashboardOverview({ username }: DashboardOverviewProps) {
                     </div>
                     <div className="expectation-item">
                       <span className="expectation-symbol" aria-hidden="true">£</span>
-                      <span><small>PAY & WORK STYLE</small><strong>{salaryRange} · {expectations.remote ? "Remote included" : "On-site or hybrid"}</strong></span>
+                      <span><small>PAY & WORK STYLE</small><strong>{salaryRange} · {expectations.workArrangement}</strong></span>
                     </div>
                     <div className="expectation-item">
                       <span className="expectation-symbol" aria-hidden="true">✦</span>

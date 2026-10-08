@@ -152,9 +152,15 @@ Configure the API's SQL Server connection string before applying migrations. The
 
 ### Job expectations
 
-Each authenticated user can save one job-expectations profile covering job titles, company size/values/culture preferences, location, commute time, salary range, and remote preference. The dashboard loads this profile and allows it to be edited; after saving, it reloads the profile from the API so the displayed values reflect persisted data.
+Each authenticated user can save one job-expectations profile covering job titles, company size/values/culture preferences, location, commute time, salary range, and work arrangement (on-site, remote, hybrid, or all). The dashboard loads this profile and allows it to be edited; after saving, it reloads the profile from the API so the displayed values reflect persisted data.
 
-The API exposes authenticated `GET` and `PUT` endpoints at `/api/JobExpectations`. Apply the `AddJobExpectations` migration before using these endpoints against a database.
+The API exposes authenticated `GET` and `PUT` endpoints at `/api/JobExpectations`. Apply the `AddJobExpectations` and `AddJobWorkArrangement` migrations before using these endpoints against a database.
+
+### Personal details
+
+Each authenticated user can maintain a personal profile with their name, email, phone number, location, and professional summary. The dashboard displays the saved details and provides an edit form; saving updates the database and refreshes the displayed profile.
+
+The API exposes authenticated `GET` and `PUT` endpoints at `/api/PersonalDetails`. Apply the `AddPersonalDetails` migration before using these endpoints against a database.
 
 ### 2. Configure and run the UI
 

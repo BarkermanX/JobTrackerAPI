@@ -7,7 +7,7 @@ export interface JobExpectations {
     maxCommuteMinutes: number;
     minimumSalary: number;
     maximumSalary: number;
-    remote: boolean;
+    workArrangement: "On-site" | "Remote" | "Hybrid" | "All";
 }
 
 async function getError(response: Response, fallback: string): Promise<Error> {

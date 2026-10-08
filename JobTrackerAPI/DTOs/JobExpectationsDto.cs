@@ -17,14 +17,16 @@ namespace JobTrackerAPI.DTOs
         public string Location { get; set; } = string.Empty;
 
         [Range(0, 1440)]
-        public int MaxCommuteMinutes { get; set; } = 30;
+        public int MaxCommuteMinutes { get; set; } = 60;
 
         [Range(0, 10000000)]
-        public decimal MinimumSalary { get; set; } = 50000;
+        public decimal MinimumSalary { get; set; } = 0;
 
         [Range(0, 10000000)]
-        public decimal MaximumSalary { get; set; } = 60000;
+        public decimal MaximumSalary { get; set; } = 0;
 
-        public bool Remote { get; set; } = true;
+        [Required]
+        [RegularExpression("^(On-site|Remote|Hybrid|All)$")]
+        public string WorkArrangement { get; set; } = "All";
     }
 }

@@ -11,5 +11,6 @@
         public string Role { get; set; } = string.Empty;
 
         public JobExpectation? JobExpectation { get; set; }
+        public PersonalDetails? PersonalDetails { get; set; }
     }
 }
