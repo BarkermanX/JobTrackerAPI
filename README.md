@@ -174,6 +174,12 @@ Each authenticated user can save and update multiple roles they are considering,
 
 The API exposes authenticated `GET` and `POST` endpoints at `/api/SavedJobs`, `PUT` and `DELETE` endpoints at `/api/SavedJobs/{id}`. Apply the `AddSavedJobs` migration before using these endpoints against a database.
 
+### Interviews and follow-ups
+
+Each authenticated user can add, edit, and delete interview or follow-up calendar events. Events track company, job title, date and time, an optional location or meeting link, and notes. Upcoming events are listed before past events, and the dashboard interview count reflects upcoming interviews.
+
+The API exposes authenticated `GET` and `POST` endpoints at `/api/InterviewFollowUps`, and `PUT` and `DELETE` endpoints at `/api/InterviewFollowUps/{id}`. Apply the `AddInterviewFollowUps` migration before using these endpoints against a database.
+
 ### 2. Configure and run the UI
 
 From the JobTrackerUI directory:

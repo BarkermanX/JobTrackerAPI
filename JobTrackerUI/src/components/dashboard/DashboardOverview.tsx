@@ -18,6 +18,7 @@ import {
   type JobApplicationStatus,
 } from "../../api/jobApplicationsApi";
 import JobApplicationForm from "./JobApplicationForm";
+import InterviewFollowUps from "./InterviewFollowUps";
 import JobsConsidering from "./JobsConsidering";
 
 interface DashboardOverviewProps {
@@ -50,11 +51,13 @@ function DashboardOverview({ username }: DashboardOverviewProps) {
   const [applicationsError, setApplicationsError] = useState("");
   const [applicationToast, setApplicationToast] = useState("");
   const [applicationFormOpen, setApplicationFormOpen] = useState(false);
+  const [applicationsExpanded, setApplicationsExpanded] = useState(false);
   const [pendingDeleteApplication, setPendingDeleteApplication] = useState<JobApplication | null>(null);
   const [deleteApplicationError, setDeleteApplicationError] = useState("");
   const [updatingApplicationId, setUpdatingApplicationId] = useState<number | null>(null);
   const [deletingApplicationId, setDeletingApplicationId] = useState<number | null>(null);
   const [consideringCount, setConsideringCount] = useState<number | null>(null);
+  const [upcomingInterviewCount, setUpcomingInterviewCount] = useState<number | null>(null);
   const [expectations, setExpectations] = useState<JobExpectations | null>(null);
   const [personalDetails, setPersonalDetails] = useState<PersonalDetails | null>(null);
   const [personalDetailsLoading, setPersonalDetailsLoading] = useState(true);
@@ -145,6 +148,9 @@ function DashboardOverview({ username }: DashboardOverviewProps) {
   const offerCount = applications.filter(application => application.status === "Offer").length;
   const handleConsideringCountChange = useCallback((count: number | null) => {
     setConsideringCount(count);
+  }, []);
+  const handleUpcomingInterviewsChange = useCallback((count: number | null) => {
+    setUpcomingInterviewCount(count);
   }, []);
 
   useEffect(() => () => {
@@ -309,7 +315,7 @@ function DashboardOverview({ username }: DashboardOverviewProps) {
         <article className="stat-card">
           <span className="stat-icon stat-icon-blue" aria-hidden="true">◷</span>
           <span className="stat-label">Interviews</span>
-          <strong>0</strong>
+          <strong>{upcomingInterviewCount === null ? "—" : upcomingInterviewCount}</strong>
           <span className="stat-caption">Upcoming conversations</span>
         </article>
         <article className="stat-card">
@@ -586,6 +592,16 @@ function DashboardOverview({ username }: DashboardOverviewProps) {
           </div>
           <div className="application-heading-actions">
             <span className="section-count">{applications.length} {applications.length === 1 ? "application" : "applications"}</span>
+            {!applicationFormOpen && applications.length > 3 && (
+              <button
+                aria-expanded={applicationsExpanded}
+                className="list-expand-button"
+                onClick={() => setApplicationsExpanded(expanded => !expanded)}
+                type="button"
+              >
+                {applicationsExpanded ? "Show less" : "Show all"}
+              </button>
+            )}
             {!applicationFormOpen && (
               <button
                 className="job-application-add-button"
@@ -607,7 +623,7 @@ function DashboardOverview({ username }: DashboardOverviewProps) {
             {applicationsError && (
               <p className="job-applications-error" role="alert">{applicationsError}</p>
             )}
-            <div className="table-wrap">
+            <div className={`table-wrap${applicationsExpanded ? " is-expanded" : ""}`}>
               <div className="application-table application-table-header">
                 <span>ROLE & COMPANY</span><span>LOCATION</span><span>DATE APPLIED</span><span>STATUS</span><span>ACTIONS</span>
               </div>
@@ -723,27 +739,7 @@ function DashboardOverview({ username }: DashboardOverviewProps) {
 
       <section className="dashboard-grid dashboard-grid-lower">
         <JobsConsidering onCountChange={handleConsideringCountChange} />
-
-        <article className="dashboard-card" id="follow-ups">
-          <div className="card-heading">
-            <div className="card-title-wrap">
-              <span className="card-icon card-icon-blue" aria-hidden="true">
-                <svg className="conversation-icon" viewBox="0 0 24 24" focusable="false">
-                  <circle cx="8.5" cy="8" r="3" />
-                  <circle cx="16.5" cy="9" r="2.5" />
-                  <path d="M3.5 19v-1a5 5 0 0 1 10 0v1zM14 14a4.2 4.2 0 0 1 6.5 3.5v.5h-5" />
-                </svg>
-              </span>
-              <div><h2>Interviews & follow-ups</h2><p>Stay ready for your next conversation</p></div>
-            </div>
-            <span className="coming-soon">PLANNER</span>
-          </div>
-          <div className="compact-empty">
-            <span className="empty-icon empty-icon-small" aria-hidden="true">✓</span>
-            <strong>Nothing on the calendar</strong>
-            <p>Interview dates, reminders and follow-up notes will be easy to find here.</p>
-          </div>
-        </article>
+        <InterviewFollowUps onUpcomingInterviewsChange={handleUpcomingInterviewsChange} />
       </section>
 
       <section className="dashboard-grid dashboard-grid-lower">

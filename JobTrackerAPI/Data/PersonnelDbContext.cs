@@ -123,6 +123,36 @@ namespace JobTrackerAPI.Data
             modelBuilder.Entity<SavedJob>()
                 .Property(savedJob => savedJob.Notes)
                 .HasMaxLength(2000);
+
+            modelBuilder.Entity<InterviewFollowUp>()
+                .HasOne(followUp => followUp.User)
+                .WithMany(user => user.InterviewFollowUps)
+                .HasForeignKey(followUp => followUp.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<InterviewFollowUp>()
+                .Property(followUp => followUp.CompanyName)
+                .HasMaxLength(120);
+
+            modelBuilder.Entity<InterviewFollowUp>()
+                .Property(followUp => followUp.JobTitle)
+                .HasMaxLength(120);
+
+            modelBuilder.Entity<InterviewFollowUp>()
+                .Property(followUp => followUp.Type)
+                .HasMaxLength(16);
+
+            modelBuilder.Entity<InterviewFollowUp>()
+                .Property(followUp => followUp.ScheduledAt)
+                .HasColumnType("datetimeoffset");
+
+            modelBuilder.Entity<InterviewFollowUp>()
+                .Property(followUp => followUp.LocationOrLink)
+                .HasMaxLength(300);
+
+            modelBuilder.Entity<InterviewFollowUp>()
+                .Property(followUp => followUp.Notes)
+                .HasMaxLength(2000);
         }
 
         public DbSet<Personnel> Personnel { get; set; }
@@ -132,5 +162,6 @@ namespace JobTrackerAPI.Data
         public DbSet<PersonalDetails> PersonalDetails { get; set; }
         public DbSet<JobApplication> JobApplications { get; set; }
         public DbSet<SavedJob> SavedJobs { get; set; }
+        public DbSet<InterviewFollowUp> InterviewFollowUps { get; set; }
     }
 }

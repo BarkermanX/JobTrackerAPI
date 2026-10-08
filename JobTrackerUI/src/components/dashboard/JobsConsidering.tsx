@@ -74,6 +74,7 @@ function JobsConsidering({ onCountChange }: JobsConsideringProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [formOpen, setFormOpen] = useState(false);
+  const [savedJobsExpanded, setSavedJobsExpanded] = useState(false);
   const [editingSavedJob, setEditingSavedJob] = useState<SavedJob | null>(null);
   const [pendingDelete, setPendingDelete] = useState<SavedJob | null>(null);
   const [deleteError, setDeleteError] = useState("");
@@ -207,6 +208,16 @@ function JobsConsidering({ onCountChange }: JobsConsideringProps) {
           </div>
           <div className="saved-jobs-heading-actions">
             <span className="section-count">{savedJobs.length} saved</span>
+            {!formOpen && !editingSavedJob && savedJobs.length > 3 && (
+              <button
+                aria-expanded={savedJobsExpanded}
+                className="list-expand-button"
+                onClick={() => setSavedJobsExpanded(expanded => !expanded)}
+                type="button"
+              >
+                {savedJobsExpanded ? "Show less" : "Show all"}
+              </button>
+            )}
             {!formOpen && (
               <button
                 className="job-application-add-button"
@@ -234,7 +245,7 @@ function JobsConsidering({ onCountChange }: JobsConsideringProps) {
         ) : error ? (
           <p className="job-applications-error" role="alert">{error}</p>
         ) : savedJobs.length > 0 ? (
-          <div className="saved-jobs-list">
+          <div className={`saved-jobs-list${savedJobsExpanded ? " is-expanded" : ""}`}>
             {savedJobs.map(savedJob => {
               const deadline = getDeadline(savedJob);
               return (

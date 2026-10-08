@@ -14,5 +14,6 @@
         public PersonalDetails? PersonalDetails { get; set; }
         public ICollection<JobApplication> JobApplications { get; set; } = new List<JobApplication>();
         public ICollection<SavedJob> SavedJobs { get; set; } = new List<SavedJob>();
+        public ICollection<InterviewFollowUp> InterviewFollowUps { get; set; } = new List<InterviewFollowUp>();
     }
 }
