@@ -116,6 +116,21 @@
   text-align: center;
 }
 
+.nav-icon svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+  vertical-align: -3px;
+}
+
+.nav-icon svg.notebook-icon {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.6;
+}
+
 .topbar-avatar {
   width: 31px;
   height: 31px;
@@ -557,6 +572,22 @@
   color: #568bc5;
 }
 
+.card-icon-blue svg {
+  width: 19px;
+  height: 19px;
+  fill: currentColor;
+}
+
+.card-icon-green svg.notebook-icon {
+  width: 19px;
+  height: 19px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.6;
+}
+
 .stat-icon-green,
 .card-icon-green {
   background: #eaf5ef;
@@ -597,7 +628,7 @@
 }
 
 .dashboard-grid-overview {
-  grid-template-columns: 1.05fr 0.95fr;
+  grid-template-columns: minmax(0, 1fr);
   margin-bottom: 15px;
 }
 
@@ -617,7 +648,7 @@
 }
 
 .dashboard-grid-overview > .dashboard-card {
-  min-height: 272px;
+  min-height: 0;
 }
 
 .card-heading {
@@ -626,6 +657,40 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+}
+
+.card-heading-actions {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-collapse-button {
+  width: 29px;
+  height: 29px;
+  flex: 0 0 29px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #e5e1ec;
+  border-radius: 7px;
+  background: #fff;
+  color: #645586;
+  cursor: pointer;
+  font: inherit;
+  font-size: 17px;
+  line-height: 1;
+  transition: background 150ms ease, border-color 150ms ease;
+}
+
+.card-collapse-button:hover {
+  border-color: #cdbde8;
+  background: #f6f2fc;
+}
+
+.card-collapse-button:focus-visible {
+  outline: 2px solid #7952d8;
+  outline-offset: 2px;
 }
 
 .card-title-wrap {

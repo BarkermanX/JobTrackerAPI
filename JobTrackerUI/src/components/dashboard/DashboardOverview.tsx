@@ -14,6 +14,8 @@ function DashboardOverview({ username }: DashboardOverviewProps) {
   const [expectationsLoading, setExpectationsLoading] = useState(true);
   const [expectationsError, setExpectationsError] = useState("");
   const [editingExpectations, setEditingExpectations] = useState(false);
+  const [expectationsExpanded, setExpectationsExpanded] = useState(false);
+  const [personalDetailsExpanded, setPersonalDetailsExpanded] = useState(false);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -133,82 +135,125 @@ function DashboardOverview({ username }: DashboardOverviewProps) {
       </section>
 
       <section className="dashboard-grid dashboard-grid-overview">
-        <article className="dashboard-card" id="expectations">
+        <article
+          className={`dashboard-card${personalDetailsExpanded ? "" : " is-collapsed"}`}
+          id="personal-details"
+        >
+          <div className="card-heading">
+            <div className="card-title-wrap">
+              <span className="card-icon card-icon-blue" aria-hidden="true">
+                <svg viewBox="0 0 24 24" focusable="false">
+                  <circle cx="12" cy="8" r="3.5" />
+                  <path d="M5.5 20v-1.5a6.5 6.5 0 0 1 13 0V20z" />
+                </svg>
+              </span>
+              <div><h2>Personal details</h2><p>Your professional introduction</p></div>
+            </div>
+            <div className="card-heading-actions">
+              <span className="coming-soon">PROFILE</span>
+              <button
+                className="card-collapse-button"
+                type="button"
+                aria-expanded={personalDetailsExpanded}
+                aria-controls="personal-details-content"
+                aria-label={`${personalDetailsExpanded ? "Collapse" : "Expand"} personal details`}
+                onClick={() => setPersonalDetailsExpanded(expanded => !expanded)}
+              >
+                <span aria-hidden="true">{personalDetailsExpanded ? "−" : "+"}</span>
+              </button>
+            </div>
+          </div>
+          <div id="personal-details-content" hidden={!personalDetailsExpanded}>
+            <div className="profile-empty">
+              <span className="profile-placeholder" aria-hidden="true">+</span>
+              <div>
+                <strong>Make it yours</strong>
+                <p>Add your contact details, preferred name and a short professional summary.</p>
+              </div>
+            </div>
+            <div className="profile-details-hint">
+              <span>CONTACT</span><span>LOCATION</span><span>ABOUT YOU</span>
+            </div>
+          </div>
+        </article>
+
+        <article
+          className={`dashboard-card${expectationsExpanded ? "" : " is-collapsed"}`}
+          id="expectations"
+        >
           <div className="card-heading">
             <div className="card-title-wrap">
               <span className="card-icon card-icon-lilac" aria-hidden="true">◎</span>
               <div><h2>Job expectations</h2><p>What matters in your next role</p></div>
             </div>
-            <button
-              className="expectations-edit-button"
-              type="button"
-              aria-expanded={editingExpectations}
-              aria-controls="job-expectations-form"
-              onClick={() => setEditingExpectations(open => !open)}
-            >
-              {editingExpectations ? "Hide form" : "Edit expectations"}
-            </button>
-          </div>
-          {editingExpectations ? (
-            <div id="job-expectations-form" className="expectations-form-container">
-              <JobExpectationsForm
-                onSaved={savedExpectations => {
-                  setExpectations(savedExpectations);
-                  setExpectationsError("");
+            <div className="card-heading-actions">
+              <button
+                className="expectations-edit-button"
+                type="button"
+                aria-expanded={editingExpectations}
+                aria-controls="job-expectations-form"
+                onClick={() => {
+                  setExpectationsExpanded(true);
+                  setEditingExpectations(open => !open);
                 }}
-                onCancel={() => setEditingExpectations(false)}
-              />
+              >
+                {editingExpectations ? "Hide form" : "Edit expectations"}
+              </button>
+              <button
+                className="card-collapse-button"
+                type="button"
+                aria-expanded={expectationsExpanded}
+                aria-controls="expectations-content"
+                aria-label={`${expectationsExpanded ? "Collapse" : "Expand"} job expectations`}
+                onClick={() => setExpectationsExpanded(expanded => !expanded)}
+              >
+                <span aria-hidden="true">{expectationsExpanded ? "−" : "+"}</span>
+              </button>
             </div>
-          ) : (
-            <>
-              {expectationsLoading ? (
-                <p className="expectations-summary-message">Loading your saved expectations…</p>
-              ) : expectationsError ? (
-                <p className="expectations-summary-error" role="alert">{expectationsError}</p>
-              ) : expectations ? (
-                <div className="expectations-list">
-                  <div className="expectation-item">
-                    <span className="expectation-symbol" aria-hidden="true">⌕</span>
-                    <span><small>POSITIONS & TITLES</small><strong>{expectations.jobTitles.length > 0 ? expectations.jobTitles.join(", ") : "Add the roles you’re looking for"}</strong></span>
+          </div>
+          <div id="expectations-content" hidden={!expectationsExpanded}>
+            {editingExpectations ? (
+              <div id="job-expectations-form" className="expectations-form-container">
+                <JobExpectationsForm
+                  onSaved={savedExpectations => {
+                    setExpectations(savedExpectations);
+                    setExpectationsError("");
+                  }}
+                  onCancel={() => setEditingExpectations(false)}
+                />
+              </div>
+            ) : (
+              <>
+                {expectationsLoading ? (
+                  <p className="expectations-summary-message">Loading your saved expectations…</p>
+                ) : expectationsError ? (
+                  <p className="expectations-summary-error" role="alert">{expectationsError}</p>
+                ) : expectations ? (
+                  <div className="expectations-list">
+                    <div className="expectation-item">
+                      <span className="expectation-symbol" aria-hidden="true">⌕</span>
+                      <span><small>POSITIONS & TITLES</small><strong>{expectations.jobTitles.length > 0 ? expectations.jobTitles.join(", ") : "Add the roles you’re looking for"}</strong></span>
+                    </div>
+                    <div className="expectation-item">
+                      <span className="expectation-symbol" aria-hidden="true">⌖</span>
+                      <span><small>LOCATION & COMMUTE</small><strong>{expectations.location || "Set your location"} · {expectations.maxCommuteMinutes} min commute</strong></span>
+                    </div>
+                    <div className="expectation-item">
+                      <span className="expectation-symbol" aria-hidden="true">£</span>
+                      <span><small>PAY & WORK STYLE</small><strong>{salaryRange} · {expectations.remote ? "Remote included" : "On-site or hybrid"}</strong></span>
+                    </div>
+                    <div className="expectation-item">
+                      <span className="expectation-symbol" aria-hidden="true">✦</span>
+                      <span><small>COMPANY PREFERENCES</small><strong>{expectations.companyPreferences.length > 0 ? expectations.companyPreferences.join(", ") : "Set company size, values or culture preferences"}</strong></span>
+                    </div>
                   </div>
-                  <div className="expectation-item">
-                    <span className="expectation-symbol" aria-hidden="true">⌖</span>
-                    <span><small>LOCATION & COMMUTE</small><strong>{expectations.location || "Set your location"} · {expectations.maxCommuteMinutes} min commute</strong></span>
-                  </div>
-                  <div className="expectation-item">
-                    <span className="expectation-symbol" aria-hidden="true">£</span>
-                    <span><small>PAY & WORK STYLE</small><strong>{salaryRange} · {expectations.remote ? "Remote included" : "On-site or hybrid"}</strong></span>
-                  </div>
-                  <div className="expectation-item">
-                    <span className="expectation-symbol" aria-hidden="true">✦</span>
-                    <span><small>COMPANY PREFERENCES</small><strong>{expectations.companyPreferences.length > 0 ? expectations.companyPreferences.join(", ") : "Set company size, values or culture preferences"}</strong></span>
-                  </div>
-                </div>
-              ) : null}
-              <p className="card-footnote">Use your preferences to keep the right opportunities in focus.</p>
-            </>
-          )}
+                ) : null}
+                <p className="card-footnote">Use your preferences to keep the right opportunities in focus.</p>
+              </>
+            )}
+          </div>
         </article>
 
-        <article className="dashboard-card" id="personal-details">
-          <div className="card-heading">
-            <div className="card-title-wrap">
-              <span className="card-icon card-icon-blue" aria-hidden="true">◉</span>
-              <div><h2>Personal details</h2><p>Your professional introduction</p></div>
-            </div>
-            <span className="coming-soon">PROFILE</span>
-          </div>
-          <div className="profile-empty">
-            <span className="profile-placeholder" aria-hidden="true">+</span>
-            <div>
-              <strong>Make it yours</strong>
-              <p>Add your contact details, preferred name and a short professional summary.</p>
-            </div>
-          </div>
-          <div className="profile-details-hint">
-            <span>CONTACT</span><span>LOCATION</span><span>ABOUT YOU</span>
-          </div>
-        </article>
       </section>
 
       <section className="dashboard-card pipeline-card" id="applied">
@@ -267,7 +312,12 @@ function DashboardOverview({ username }: DashboardOverviewProps) {
         <article className="dashboard-card portfolio-card" id="portfolio">
           <div className="card-heading">
             <div className="card-title-wrap">
-              <span className="card-icon card-icon-green" aria-hidden="true">▤</span>
+              <span className="card-icon card-icon-green" aria-hidden="true">
+                <svg className="notebook-icon" viewBox="0 0 24 24" focusable="false">
+                  <path d="M6 3.5h13a1.5 1.5 0 0 1 1.5 1.5v14a1.5 1.5 0 0 1-1.5 1.5H6z" />
+                  <path d="M6 3.5v17M3.5 7h5M3.5 12h5M3.5 17h5M10 8h6M10 12h6M10 16h6" />
+                </svg>
+              </span>
               <div><h2>Portfolio notes</h2><p>Collect the details you’ll want to remember</p></div>
             </div>
             <span className="coming-soon">NOTES</span>

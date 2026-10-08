@@ -36,7 +36,19 @@ function DashboardLayout({ username, onLogout, children }: DashboardLayoutProps)
               href={`#${section.id}`}
               key={section.id}
             >
-              <span className="nav-icon" aria-hidden="true">{section.icon}</span>
+              <span className="nav-icon" aria-hidden="true">
+                {section.id === "personal-details" ? (
+                  <svg viewBox="0 0 24 24" focusable="false">
+                    <circle cx="12" cy="8" r="3.5" />
+                    <path d="M5.5 20v-1.5a6.5 6.5 0 0 1 13 0V20z" />
+                  </svg>
+                ) : section.id === "portfolio" ? (
+                  <svg className="notebook-icon" viewBox="0 0 24 24" focusable="false">
+                    <path d="M6 3.5h13a1.5 1.5 0 0 1 1.5 1.5v14a1.5 1.5 0 0 1-1.5 1.5H6z" />
+                    <path d="M6 3.5v17M3.5 7h5M3.5 12h5M3.5 17h5M10 8h6M10 12h6M10 16h6" />
+                  </svg>
+                ) : section.icon}
+              </span>
               <span>{section.label}</span>
             </a>
           ))}

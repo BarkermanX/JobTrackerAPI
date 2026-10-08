@@ -147,8 +147,7 @@ export default function JobExpectationsForm({
                             setFormData(previous => ({
                                 ...previous,
                                 jobTitles: event.target.value
-                                    .split(",")
-                                    .map(title => title.trim())
+                                    .split(",")                                    
                                     .filter(Boolean),
                             }));
                             setSaved(false);
