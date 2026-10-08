@@ -4,6 +4,7 @@ using JobTrackerAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace JobTrackerAPI.Migrations
 {
     [DbContext(typeof(PersonnelDbContext))]
-    partial class PersonnelDbContextModelSnapshot : ModelSnapshot
+    [Migration("20261008112603_AddJobApplications")]
+    partial class AddJobApplications
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -240,60 +243,6 @@ namespace JobTrackerAPI.Migrations
                     b.ToTable("RefreshTokens");
                 });
 
-            modelBuilder.Entity("JobTrackerAPI.Models.SavedJob", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateOnly?>("ClosingDate")
-                        .HasColumnType("date");
-
-                    b.Property<string>("CompanyName")
-                        .IsRequired()
-                        .HasMaxLength(120)
-                        .HasColumnType("nvarchar(120)");
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("JobTitle")
-                        .IsRequired()
-                        .HasMaxLength(120)
-                        .HasColumnType("nvarchar(120)");
-
-                    b.Property<string>("JobUrl")
-                        .IsRequired()
-                        .HasMaxLength(2048)
-                        .HasColumnType("nvarchar(2048)");
-
-                    b.Property<string>("Location")
-                        .IsRequired()
-                        .HasMaxLength(120)
-                        .HasColumnType("nvarchar(120)");
-
-                    b.Property<string>("Notes")
-                        .IsRequired()
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
-
-                    b.Property<string>("Salary")
-                        .IsRequired()
-                        .HasMaxLength(120)
-                        .HasColumnType("nvarchar(120)");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("SavedJobs");
-                });
-
             modelBuilder.Entity("JobTrackerAPI.Models.User", b =>
                 {
                     b.Property<int>("Id")
@@ -363,17 +312,6 @@ namespace JobTrackerAPI.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("JobTrackerAPI.Models.SavedJob", b =>
-                {
-                    b.HasOne("JobTrackerAPI.Models.User", "User")
-                        .WithMany("SavedJobs")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("JobTrackerAPI.Models.User", b =>
                 {
                     b.Navigation("JobApplications");
@@ -381,8 +319,6 @@ namespace JobTrackerAPI.Migrations
                     b.Navigation("JobExpectation");
 
                     b.Navigation("PersonalDetails");
-
-                    b.Navigation("SavedJobs");
                 });
 #pragma warning restore 612, 618
         }

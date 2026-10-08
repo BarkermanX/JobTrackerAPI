@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import JobExpectationsForm from "../JobExpectationsForm";
 import {
   getJobExpectations,
@@ -9,12 +9,52 @@ import {
   getPersonalDetails,
   type PersonalDetails,
 } from "../../api/personalDetailsApi";
+import {
+  getJobApplications,
+  jobApplicationStatuses,
+  deleteJobApplication,
+  updateJobApplicationStatus,
+  type JobApplication,
+  type JobApplicationStatus,
+} from "../../api/jobApplicationsApi";
+import JobApplicationForm from "./JobApplicationForm";
+import JobsConsidering from "./JobsConsidering";
 
 interface DashboardOverviewProps {
   username: string;
 }
 
+const applicationStatusOrder: Record<JobApplicationStatus, number> = {
+  Applied: 0,
+  Interview: 1,
+  Offer: 2,
+  Rejected: 3,
+  Withdrawn: 4,
+};
+
+function sortApplications(applications: JobApplication[]): JobApplication[] {
+  return [...applications].sort((first, second) =>
+    applicationStatusOrder[first.status] - applicationStatusOrder[second.status] ||
+    second.dateApplied.localeCompare(first.dateApplied) ||
+    first.companyName.localeCompare(second.companyName));
+}
+
 function DashboardOverview({ username }: DashboardOverviewProps) {
+  const applicationChangesDuringLoad = useRef(false);
+  const applicationToastTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const applicationSectionRef = useRef<HTMLElement>(null);
+  const deleteTriggerRef = useRef<HTMLButtonElement | null>(null);
+  const cancelDeleteButtonRef = useRef<HTMLButtonElement>(null);
+  const [applications, setApplications] = useState<JobApplication[]>([]);
+  const [applicationsLoading, setApplicationsLoading] = useState(true);
+  const [applicationsError, setApplicationsError] = useState("");
+  const [applicationToast, setApplicationToast] = useState("");
+  const [applicationFormOpen, setApplicationFormOpen] = useState(false);
+  const [pendingDeleteApplication, setPendingDeleteApplication] = useState<JobApplication | null>(null);
+  const [deleteApplicationError, setDeleteApplicationError] = useState("");
+  const [updatingApplicationId, setUpdatingApplicationId] = useState<number | null>(null);
+  const [deletingApplicationId, setDeletingApplicationId] = useState<number | null>(null);
+  const [consideringCount, setConsideringCount] = useState<number | null>(null);
   const [expectations, setExpectations] = useState<JobExpectations | null>(null);
   const [personalDetails, setPersonalDetails] = useState<PersonalDetails | null>(null);
   const [personalDetailsLoading, setPersonalDetailsLoading] = useState(true);
@@ -40,6 +80,29 @@ function DashboardOverview({ username }: DashboardOverviewProps) {
       })
       .finally(() => {
         if (!controller.signal.aborted) setExpectationsLoading(false);
+      });
+
+    return () => controller.abort();
+  }, []);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    getJobApplications(controller.signal)
+      .then(items => {
+        if (!applicationChangesDuringLoad.current) {
+          setApplications(sortApplications(items));
+        }
+      })
+      .catch((error: unknown) => {
+        if (controller.signal.aborted || applicationChangesDuringLoad.current) return;
+        console.error("Unable to load dashboard job applications:", error);
+        setApplicationsError(error instanceof Error
+          ? error.message
+          : "Unable to load your job applications.");
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setApplicationsLoading(false);
       });
 
     return () => controller.abort();
@@ -78,6 +141,129 @@ function DashboardOverview({ username }: DashboardOverviewProps) {
     expectations.maximumSalary !== 60000 ||
     expectations.workArrangement !== "All"
   );
+  const interviewCount = applications.filter(application => application.status === "Interview").length;
+  const offerCount = applications.filter(application => application.status === "Offer").length;
+  const handleConsideringCountChange = useCallback((count: number | null) => {
+    setConsideringCount(count);
+  }, []);
+
+  useEffect(() => () => {
+    if (applicationToastTimeout.current !== null) {
+      clearTimeout(applicationToastTimeout.current);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!pendingDeleteApplication) return;
+
+    const applicationSection = applicationSectionRef.current;
+    cancelDeleteButtonRef.current?.focus();
+    return () => {
+      if (deleteTriggerRef.current && document.body.contains(deleteTriggerRef.current)) {
+        deleteTriggerRef.current.focus();
+      } else {
+        applicationSection?.focus();
+      }
+    };
+  }, [pendingDeleteApplication]);
+
+  function showApplicationToast(message: string) {
+    if (applicationToastTimeout.current !== null) {
+      clearTimeout(applicationToastTimeout.current);
+    }
+
+    setApplicationToast(message);
+    applicationToastTimeout.current = setTimeout(() => {
+      setApplicationToast("");
+      applicationToastTimeout.current = null;
+    }, 3000);
+  }
+
+  async function handleApplicationStatusChange(id: number, status: JobApplicationStatus) {
+    setUpdatingApplicationId(id);
+    setApplicationsError("");
+    setApplicationToast("");
+    if (applicationToastTimeout.current !== null) {
+      clearTimeout(applicationToastTimeout.current);
+      applicationToastTimeout.current = null;
+    }
+
+    try {
+      const updatedApplication = await updateJobApplicationStatus(id, status);
+      setApplications(current => sortApplications(current.map(application =>
+        application.id === id ? updatedApplication : application)));
+      showApplicationToast("Application status saved successfully.");
+    } catch (error: unknown) {
+      console.error("Unable to update job application status:", error);
+      setApplicationsError(error instanceof Error
+        ? error.message
+        : "Unable to update the application status.");
+    } finally {
+      setUpdatingApplicationId(null);
+    }
+  }
+
+  async function handleApplicationDelete() {
+    if (!pendingDeleteApplication) return;
+    const application = pendingDeleteApplication;
+    setDeletingApplicationId(application.id);
+    setDeleteApplicationError("");
+
+    try {
+      await deleteJobApplication(application.id);
+      setApplications(current => current.filter(item => item.id !== application.id));
+      setPendingDeleteApplication(null);
+      showApplicationToast("Job application deleted successfully.");
+    } catch (error: unknown) {
+      console.error("Unable to delete job application:", error);
+      setDeleteApplicationError(error instanceof Error
+        ? error.message
+        : "Unable to delete this job application.");
+    } finally {
+      setDeletingApplicationId(null);
+    }
+  }
+
+  function handleDeleteDialogKeyDown(event: ReactKeyboardEvent<HTMLDivElement>) {
+    if (event.key === "Escape" && deletingApplicationId === null) {
+      event.preventDefault();
+      setPendingDeleteApplication(null);
+      return;
+    }
+
+    if (event.key !== "Tab") return;
+    const focusableElements = event.currentTarget.querySelectorAll<HTMLElement>(
+      'button:not(:disabled)',
+    );
+    const firstElement = focusableElements.item(0);
+    const lastElement = focusableElements.item(focusableElements.length - 1);
+
+    if (event.shiftKey && document.activeElement === firstElement) {
+      event.preventDefault();
+      lastElement?.focus();
+    } else if (!event.shiftKey && document.activeElement === lastElement) {
+      event.preventDefault();
+      firstElement?.focus();
+    }
+  }
+
+  async function handleApplicationSaved(application: JobApplication) {
+    applicationChangesDuringLoad.current = true;
+    setApplications(current => sortApplications([...current, application]));
+    setApplicationsLoading(false);
+    setApplicationsError("");
+    setApplicationFormOpen(false);
+
+    try {
+      const refreshedApplications = await getJobApplications();
+      setApplications(sortApplications(refreshedApplications));
+    } catch (error: unknown) {
+      console.error("Unable to refresh job applications after saving:", error);
+      setApplicationsError(error instanceof Error
+        ? error.message
+        : "The application was saved, but the list could not be refreshed.");
+    }
+  }
 
   return (
     <>
@@ -111,13 +297,13 @@ function DashboardOverview({ username }: DashboardOverviewProps) {
         <article className="stat-card">
           <span className="stat-icon stat-icon-purple" aria-hidden="true">↗</span>
           <span className="stat-label">Applications sent</span>
-          <strong>0</strong>
+          <strong>{applicationsLoading ? "—" : applications.length}</strong>
           <span className="stat-caption">Your submitted applications</span>
         </article>
         <article className="stat-card">
           <span className="stat-icon stat-icon-peach" aria-hidden="true">◇</span>
           <span className="stat-label">Roles considering</span>
-          <strong>0</strong>
+          <strong>{consideringCount === null ? "—" : consideringCount}</strong>
           <span className="stat-caption">Opportunities on your radar</span>
         </article>
         <article className="stat-card">
@@ -147,19 +333,19 @@ function DashboardOverview({ username }: DashboardOverviewProps) {
           <div className="funnel-stage is-first">
             <span className="funnel-stage-icon" aria-hidden="true">◇</span>
             <div><strong>Considering</strong><small>Roles on your radar</small></div>
-            <b>0</b>
+            <b>{consideringCount ?? "—"}</b>
           </div>
           <span className="funnel-connector" aria-hidden="true">→</span>
           <div className="funnel-stage is-applied">
             <span className="funnel-stage-icon" aria-hidden="true">↗</span>
             <div><strong>Applied</strong><small>Applications sent</small></div>
-            <b>0</b>
+            <b>{interviewCount}</b>
           </div>
           <span className="funnel-connector" aria-hidden="true">→</span>
           <div className="funnel-stage is-interview">
             <span className="funnel-stage-icon" aria-hidden="true">◷</span>
             <div><strong>Interview</strong><small>Conversations ahead</small></div>
-            <b>0</b>
+            <b>{offerCount}</b>
           </div>
           <span className="funnel-connector" aria-hidden="true">→</span>
           <div className="funnel-stage is-offer">
@@ -387,45 +573,156 @@ function DashboardOverview({ username }: DashboardOverviewProps) {
 
       </section>
 
-      <section className="dashboard-card pipeline-card" id="applied">
+      <section
+        className="dashboard-card pipeline-card"
+        id="applied"
+        ref={applicationSectionRef}
+        tabIndex={-1}
+      >
         <div className="card-heading">
           <div className="card-title-wrap">
             <span className="card-icon card-icon-purple" aria-hidden="true">↗</span>
             <div><h2>Jobs applied for</h2><p>Track each application from sent to decision</p></div>
           </div>
-          <span className="section-count">0 applications</span>
-        </div>
-        <div className="table-wrap">
-          <div className="application-table application-table-header">
-            <span>ROLE & COMPANY</span><span>LOCATION</span><span>DATE APPLIED</span><span>STATUS</span><span>NEXT STEP</span>
+          <div className="application-heading-actions">
+            <span className="section-count">{applications.length} {applications.length === 1 ? "application" : "applications"}</span>
+            {!applicationFormOpen && (
+              <button
+                className="job-application-add-button"
+                onClick={() => setApplicationFormOpen(true)}
+                type="button"
+              >
+                <span aria-hidden="true">+</span> Add application
+              </button>
+            )}
           </div>
-          <div className="table-empty">
-            <span className="empty-icon" aria-hidden="true">↗</span>
-            <strong>Your applications will show up here</strong>
-            <p>Keep an eye on application dates, stages and what to follow up on.</p>
-          </div>
         </div>
+        {applicationFormOpen ? (
+          <JobApplicationForm
+            onCancel={() => setApplicationFormOpen(false)}
+            onSaved={handleApplicationSaved}
+          />
+        ) : (
+          <>
+            {applicationsError && (
+              <p className="job-applications-error" role="alert">{applicationsError}</p>
+            )}
+            <div className="table-wrap">
+              <div className="application-table application-table-header">
+                <span>ROLE & COMPANY</span><span>LOCATION</span><span>DATE APPLIED</span><span>STATUS</span><span>ACTIONS</span>
+              </div>
+              {applicationsLoading ? (
+                <div className="table-empty"><strong>Loading your applications…</strong></div>
+              ) : applications.length > 0 ? (
+                applications.map(application => (
+                  <div className="application-table application-table-row" key={application.id}>
+                    <span className="application-role">
+                      <strong>{application.jobTitle}</strong>
+                      <small>{application.companyName}</small>
+                    </span>
+                    <span className="application-location">{application.location || "—"}</span>
+                    <time dateTime={application.dateApplied}>
+                      {new Date(`${application.dateApplied}T00:00:00`).toLocaleDateString("en-GB")}
+                    </time>
+                    <label className="application-status-control">
+                      <select
+                        aria-label={`Status for ${application.jobTitle} at ${application.companyName}`}
+                        disabled={updatingApplicationId !== null || deletingApplicationId !== null}
+                        onChange={event => handleApplicationStatusChange(
+                          application.id,
+                          event.target.value as JobApplicationStatus,
+                        )}
+                        value={application.status}
+                      >
+                        {jobApplicationStatuses.map(status => (
+                          <option key={status} value={status}>{status}</option>
+                        ))}
+                      </select>
+                    </label>
+                    <button
+                      aria-label={`Delete application for ${application.jobTitle} at ${application.companyName}`}
+                      className="job-application-delete-button"
+                      disabled={updatingApplicationId !== null || deletingApplicationId !== null}
+                      onClick={event => {
+                        deleteTriggerRef.current = event.currentTarget;
+                        setDeleteApplicationError("");
+                        setPendingDeleteApplication(application);
+                      }}
+                      type="button"
+                    >
+                      {deletingApplicationId === application.id ? "Deleting…" : "Delete"}
+                    </button>
+                  </div>
+                ))
+              ) : (
+                <div className="table-empty">
+                  <span className="empty-icon" aria-hidden="true">↗</span>
+                  <strong>Your applications will show up here</strong>
+                  <p>Keep an eye on application dates and stages as you move through your search.</p>
+                </div>
+              )}
+            </div>
+          </>
+        )}
+        {applicationToast && (
+          <div className="application-status-toast" role="status" aria-live="polite">
+            <span aria-hidden="true">✓</span>
+            {applicationToast}
+          </div>
+        )}
       </section>
 
-      <section className="dashboard-grid dashboard-grid-lower">
-        <article className="dashboard-card" id="considering">
-          <div className="card-heading">
-            <div className="card-title-wrap">
-              <span className="card-icon card-icon-peach" aria-hidden="true">
-                <svg className="saved-role-icon" viewBox="0 0 24 24" focusable="false">
-                  <path d="M6.5 3.5h11a1 1 0 0 1 1 1v16l-6.5-4.2-6.5 4.2v-16a1 1 0 0 1 1-1z" />
-                </svg>
-              </span>
-              <div><h2>Jobs considering</h2><p>Interesting roles to explore</p></div>
+      {pendingDeleteApplication && (
+        <div
+          className="application-delete-backdrop"
+          onMouseDown={event => {
+            if (event.target === event.currentTarget && deletingApplicationId === null) {
+              setPendingDeleteApplication(null);
+            }
+          }}
+        >
+          <div
+            aria-describedby="application-delete-description"
+            aria-labelledby="application-delete-title"
+            aria-modal="true"
+            className="application-delete-dialog"
+            onKeyDown={handleDeleteDialogKeyDown}
+            role="alertdialog"
+          >
+            <span className="application-delete-icon" aria-hidden="true">×</span>
+            <h2 id="application-delete-title">Delete this job application?</h2>
+            <p id="application-delete-description">
+              Are you sure you want to delete the application for{" "}
+              <strong>{pendingDeleteApplication.jobTitle}</strong> at{" "}
+              <strong>{pendingDeleteApplication.companyName}</strong>? This can’t be undone.
+            </p>
+            {deleteApplicationError && (
+              <p className="application-delete-error" role="alert">{deleteApplicationError}</p>
+            )}
+            <div className="application-delete-actions">
+              <button
+                disabled={deletingApplicationId !== null}
+                onClick={() => setPendingDeleteApplication(null)}
+                ref={cancelDeleteButtonRef}
+                type="button"
+              >
+                Cancel
+              </button>
+              <button
+                className="application-delete-confirm"
+                disabled={deletingApplicationId !== null}
+                onClick={handleApplicationDelete}
+                type="button"
+              >
+                {deletingApplicationId !== null ? "Deleting…" : "Delete application"}
+              </button>
             </div>
-            <span className="section-count">0 saved</span>
           </div>
-          <div className="compact-empty">
-            <span className="empty-icon empty-icon-small" aria-hidden="true">⌕</span>
-            <strong>No roles saved yet</strong>
-            <p>Keep promising openings here while you decide if they’re a good fit.</p>
-          </div>
-        </article>
+        </div>
+      )}
+
+      <section className="dashboard-grid dashboard-grid-lower">
+        <JobsConsidering onCountChange={handleConsideringCountChange} />
 
         <article className="dashboard-card" id="follow-ups">
           <div className="card-heading">

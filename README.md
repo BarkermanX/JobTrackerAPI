@@ -162,6 +162,18 @@ Each authenticated user can maintain a personal profile with their name, email, 
 
 The API exposes authenticated `GET` and `PUT` endpoints at `/api/PersonalDetails`. Apply the `AddPersonalDetails` migration before using these endpoints against a database.
 
+### Job applications
+
+Each authenticated user can add multiple job applications with company, role, location, application date, and status. The dashboard returns to the complete list after an application is added. Applications are ordered by workflow status (Applied, Interview, Offer, Rejected, Withdrawn) and then by application date, newest first; status can be updated directly from the list.
+
+The API exposes authenticated `GET` and `POST` endpoints at `/api/JobApplications`, a `PUT /api/JobApplications/{id}/status` endpoint, and a `DELETE /api/JobApplications/{id}` endpoint. Apply the `AddJobApplications` migration before using these endpoints against a database.
+
+### Jobs considering
+
+Each authenticated user can save and update multiple roles they are considering, including company, job title, salary, URL, location, closing date, and notes. The dashboard highlights roles with a deadline in the next three days and flags roles whose closing date has passed. Saved roles can be deleted from the list.
+
+The API exposes authenticated `GET` and `POST` endpoints at `/api/SavedJobs`, `PUT` and `DELETE` endpoints at `/api/SavedJobs/{id}`. Apply the `AddSavedJobs` migration before using these endpoints against a database.
+
 ### 2. Configure and run the UI
 
 From the JobTrackerUI directory:
