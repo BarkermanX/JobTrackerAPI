@@ -180,6 +180,12 @@ Each authenticated user can add, edit, and delete interview or follow-up calenda
 
 The API exposes authenticated `GET` and `POST` endpoints at `/api/InterviewFollowUps`, and `PUT` and `DELETE` endpoints at `/api/InterviewFollowUps/{id}`. Apply the `AddInterviewFollowUps` migration before using these endpoints against a database.
 
+### Portfolio notes
+
+Each authenticated user can add, edit, and delete portfolio notes, organized by category: project wins, skills and strengths, questions to ask, or other. Notes are ordered by most recently updated, and the dashboard shows three by default with an option to expand the list.
+
+The API exposes authenticated `GET` and `POST` endpoints at `/api/PortfolioNotes`, and `PUT` and `DELETE` endpoints at `/api/PortfolioNotes/{id}`. Apply the `AddPortfolioNotes` migration before using these endpoints against a database.
+
 ### 2. Configure and run the UI
 
 From the JobTrackerUI directory:

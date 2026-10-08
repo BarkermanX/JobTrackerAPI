@@ -153,6 +153,24 @@ namespace JobTrackerAPI.Data
             modelBuilder.Entity<InterviewFollowUp>()
                 .Property(followUp => followUp.Notes)
                 .HasMaxLength(2000);
+
+            modelBuilder.Entity<PortfolioNote>()
+                .HasOne(note => note.User)
+                .WithMany(user => user.PortfolioNotes)
+                .HasForeignKey(note => note.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<PortfolioNote>()
+                .Property(note => note.Title)
+                .HasMaxLength(120);
+
+            modelBuilder.Entity<PortfolioNote>()
+                .Property(note => note.Content)
+                .HasMaxLength(4000);
+
+            modelBuilder.Entity<PortfolioNote>()
+                .Property(note => note.Category)
+                .HasMaxLength(32);
         }
 
         public DbSet<Personnel> Personnel { get; set; }
@@ -163,5 +181,6 @@ namespace JobTrackerAPI.Data
         public DbSet<JobApplication> JobApplications { get; set; }
         public DbSet<SavedJob> SavedJobs { get; set; }
         public DbSet<InterviewFollowUp> InterviewFollowUps { get; set; }
+        public DbSet<PortfolioNote> PortfolioNotes { get; set; }
     }
 }

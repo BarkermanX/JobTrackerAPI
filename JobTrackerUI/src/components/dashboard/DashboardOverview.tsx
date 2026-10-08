@@ -20,6 +20,7 @@ import {
 import JobApplicationForm from "./JobApplicationForm";
 import InterviewFollowUps from "./InterviewFollowUps";
 import JobsConsidering from "./JobsConsidering";
+import PortfolioNotes from "./PortfolioNotes";
 
 interface DashboardOverviewProps {
   username: string;
@@ -58,6 +59,7 @@ function DashboardOverview({ username }: DashboardOverviewProps) {
   const [deletingApplicationId, setDeletingApplicationId] = useState<number | null>(null);
   const [consideringCount, setConsideringCount] = useState<number | null>(null);
   const [upcomingInterviewCount, setUpcomingInterviewCount] = useState<number | null>(null);
+  const [portfolioNoteCount, setPortfolioNoteCount] = useState<number | null>(null);
   const [expectations, setExpectations] = useState<JobExpectations | null>(null);
   const [personalDetails, setPersonalDetails] = useState<PersonalDetails | null>(null);
   const [personalDetailsLoading, setPersonalDetailsLoading] = useState(true);
@@ -151,6 +153,9 @@ function DashboardOverview({ username }: DashboardOverviewProps) {
   }, []);
   const handleUpcomingInterviewsChange = useCallback((count: number | null) => {
     setUpcomingInterviewCount(count);
+  }, []);
+  const handlePortfolioNoteCountChange = useCallback((count: number | null) => {
+    setPortfolioNoteCount(count);
   }, []);
 
   useEffect(() => () => {
@@ -321,7 +326,7 @@ function DashboardOverview({ username }: DashboardOverviewProps) {
         <article className="stat-card">
           <span className="stat-icon stat-icon-green" aria-hidden="true">▤</span>
           <span className="stat-label">Portfolio notes</span>
-          <strong>0</strong>
+          <strong>{portfolioNoteCount === null ? "—" : portfolioNoteCount}</strong>
           <span className="stat-caption">Ideas and achievements saved</span>
         </article>
       </section>
@@ -743,26 +748,7 @@ function DashboardOverview({ username }: DashboardOverviewProps) {
       </section>
 
       <section className="dashboard-grid dashboard-grid-lower">
-        <article className="dashboard-card portfolio-card" id="portfolio">
-          <div className="card-heading">
-            <div className="card-title-wrap">
-              <span className="card-icon card-icon-green" aria-hidden="true">
-                <svg className="notebook-icon" viewBox="0 0 24 24" focusable="false">
-                  <path d="M6 3.5h13a1.5 1.5 0 0 1 1.5 1.5v14a1.5 1.5 0 0 1-1.5 1.5H6z" />
-                  <path d="M6 3.5v17M3.5 7h5M3.5 12h5M3.5 17h5M10 8h6M10 12h6M10 16h6" />
-                </svg>
-              </span>
-              <div><h2>Portfolio notes</h2><p>Collect the details you’ll want to remember</p></div>
-            </div>
-            <span className="coming-soon">NOTES</span>
-          </div>
-          <div className="portfolio-prompts">
-            <span><i aria-hidden="true" />Project wins</span>
-            <span><i aria-hidden="true" />Skills & strengths</span>
-            <span><i aria-hidden="true" />Questions to ask</span>
-          </div>
-          <p className="portfolio-empty">Your achievements and interview prep notes will live here.</p>
-        </article>
+        <PortfolioNotes onCountChange={handlePortfolioNoteCountChange} />
 
         <article className="dashboard-card search-plan-card">
           <div className="card-heading">
