@@ -182,9 +182,9 @@ The API exposes authenticated `GET` and `POST` endpoints at `/api/InterviewFollo
 
 ### Portfolio notes
 
-Each authenticated user can add, edit, and delete portfolio notes, organized by category: project wins, skills and strengths, questions to ask, or other. Notes are ordered by most recently updated, and the dashboard shows three by default with an option to expand the list.
+Portfolio notes let each authenticated user keep achievements, strengths, and interview-preparation ideas in one place. Each note has a required title (up to 120 characters), content (up to 4,000 characters), and one of these categories: `Project win`, `Skills & strengths`, `Questions to ask`, or `Other`. Notes can be added, edited, and deleted; the dashboard orders them by most recently updated, shows three initially, and provides a **Show all** control when there are more. The dashboard summary count reflects the number of saved notes.
 
-The API exposes authenticated `GET` and `POST` endpoints at `/api/PortfolioNotes`, and `PUT` and `DELETE` endpoints at `/api/PortfolioNotes/{id}`. Apply the `AddPortfolioNotes` migration before using these endpoints against a database.
+The API exposes authenticated `GET` and `POST` endpoints at `/api/PortfolioNotes`, and `PUT` and `DELETE` endpoints at `/api/PortfolioNotes/{id}`. All note operations are scoped to the signed-in user. Apply the `AddPortfolioNotes` migration before using these endpoints against a database.
 
 ### 2. Configure and run the UI
 
