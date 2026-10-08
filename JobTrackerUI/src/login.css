@@ -154,9 +154,24 @@
 }
 
 .artwork-copy {
+  position: relative;
+  z-index: 0;
+  isolation: isolate;
   max-width: 450px;
   margin-top: auto;
-  padding-top: 120px;
+  padding: 28px 30px 30px;
+}
+
+.artwork-copy::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0 -30px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 16px;
+  background: linear-gradient(100deg, rgba(8, 7, 25, 0.44), rgba(8, 7, 25, 0.3) 72%, rgba(8, 7, 25, 0.16));
+  box-shadow: 0 16px 44px rgba(4, 3, 16, 0.16);
+  content: "";
+  backdrop-filter: blur(8px);
 }
 
 .artwork-eyebrow,
@@ -169,13 +184,14 @@
 
 .artwork-eyebrow {
   margin-bottom: 20px;
-  color: rgba(255, 255, 255, 0.72);
+  color: #f4d8ff;
 }
 
 .artwork-copy h2 {
   max-width: 430px;
   margin: 0 0 18px;
   color: #fff;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.3);
   font-family: Georgia, "Times New Roman", serif;
   font-size: clamp(42px, 5vw, 68px);
   font-weight: 400;
@@ -185,16 +201,23 @@
 
 .artwork-copy p {
   max-width: 360px;
-  color: rgba(255, 255, 255, 0.76);
+  margin-bottom: 0;
+  color: rgba(255, 255, 255, 0.94);
   font-size: 15px;
   line-height: 1.7;
 }
 
 .artwork-caption {
-  margin-top: 44px;
-  color: rgba(255, 255, 255, 0.58);
+  align-self: flex-start;
+  margin-top: 24px;
+  padding: 9px 13px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  background: rgba(7, 6, 22, 0.64);
+  color: rgba(255, 255, 255, 0.9);
   font-size: 12px;
   letter-spacing: 0.03em;
+  backdrop-filter: blur(6px);
 }
 
 .login-panel {
@@ -504,7 +527,13 @@
   }
 
   .artwork-copy {
-    padding-top: 24px;
+    margin-top: auto;
+    padding: 16px 18px 18px;
+  }
+
+  .artwork-copy::before {
+    inset: 0 -18px;
+    border-radius: 12px;
   }
 
   .artwork-copy p {

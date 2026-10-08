@@ -74,9 +74,9 @@ function Login() {
           <div className="artwork-copy">
             <span className="artwork-eyebrow">YOUR NEXT CHAPTER</span>
             <h2>Make your next move count.</h2>
-            <p>Keep every opportunity in view and make your job search feel a little more focused.</p>
+            <p>Track the roles you’re considering, applications you’ve sent, and interviews ahead—all in one place.</p>
           </div>
-          <span className="artwork-caption">A clearer path to what’s next.</span>
+          <span className="artwork-caption">Stay organized. Move forward with confidence.</span>
         </section>
 
         <section className="login-panel">
