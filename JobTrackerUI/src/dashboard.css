@@ -70,6 +70,16 @@
   font-size: 18px;
 }
 
+.dashboard-brand-mark svg {
+  width: 21px;
+  height: 21px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+}
+
 .sidebar-label {
   margin: 0 10px 11px;
   color: #aaa9b7;
@@ -129,6 +139,26 @@
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 1.6;
+}
+
+.nav-icon svg.expectations-icon {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.nav-icon svg.conversation-icon {
+  fill: currentColor;
+}
+
+.nav-icon svg.saved-role-icon {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
 }
 
 .topbar-avatar {
@@ -576,6 +606,32 @@
   width: 19px;
   height: 19px;
   fill: currentColor;
+}
+
+.card-icon-lilac svg.expectations-icon {
+  width: 19px;
+  height: 19px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.card-icon-blue svg.conversation-icon {
+  width: 19px;
+  height: 19px;
+  fill: currentColor;
+}
+
+.card-icon-peach svg.saved-role-icon {
+  width: 19px;
+  height: 19px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
 }
 
 .card-icon-green svg.notebook-icon {
@@ -1811,28 +1867,34 @@
 }
 
 .expectations-form-container {
-  margin-top: 15px;
+  margin-top: 18px;
+  padding: 18px;
+  border: 1px solid #e4daf4;
+  border-radius: 12px;
+  background:
+    radial-gradient(ellipse at 100% 0, rgba(124, 84, 204, 0.08), transparent 38%),
+    #faf8fe;
 }
 
 .expectations-form {
   display: grid;
-  gap: 14px;
+  gap: 16px;
 }
 
 .expectations-form-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  gap: 16px;
 }
 
 .expectations-form-field {
   min-width: 0;
   display: grid;
   align-content: start;
-  gap: 6px;
-  color: #4e495e;
-  font-size: 9px;
-  font-weight: 650;
+  gap: 7px;
+  color: #33264e;
+  font-size: 11px;
+  font-weight: 700;
 }
 
 .expectations-form-field > span {
@@ -1842,31 +1904,33 @@
 .expectations-form-field input {
   width: 100%;
   min-width: 0;
-  height: 36px;
-  padding: 0 10px;
-  border: 1px solid #e3deec;
-  border-radius: 7px;
+  height: 42px;
+  padding: 0 12px;
+  border: 1px solid #d9d2e5;
+  border-radius: 8px;
   outline: none;
-  background: #fdfcff;
-  color: #353044;
+  background: #fff;
+  color: #282137;
   font: inherit;
-  font-size: 10px;
-  font-weight: 450;
+  font-size: 12px;
+  font-weight: 500;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
 }
 
 .expectations-form-field input:focus {
-  border-color: #9274cd;
-  box-shadow: 0 0 0 3px rgba(121, 82, 216, 0.12);
+  border-color: #7952c8;
+  box-shadow: 0 0 0 3px rgba(121, 82, 216, 0.16);
 }
 
 .expectations-form-field input::placeholder {
-  color: #aaa5b4;
+  color: #858091;
 }
 
 .expectations-form-field small {
-  color: #898397;
-  font-size: 8px;
+  color: #696378;
+  font-size: 10px;
   font-weight: 450;
+  line-height: 1.45;
 }
 
 .expectations-form-wide {
@@ -1876,24 +1940,25 @@
 .expectations-input-suffix,
 .expectations-input-prefix {
   min-width: 0;
-  height: 36px;
+  height: 42px;
   display: flex;
   align-items: center;
   overflow: hidden;
-  border: 1px solid #e3deec;
-  border-radius: 7px;
-  background: #fdfcff;
+  border: 1px solid #d9d2e5;
+  border-radius: 8px;
+  background: #fff;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
 }
 
 .expectations-input-suffix:focus-within,
 .expectations-input-prefix:focus-within {
-  border-color: #9274cd;
-  box-shadow: 0 0 0 3px rgba(121, 82, 216, 0.12);
+  border-color: #7952c8;
+  box-shadow: 0 0 0 3px rgba(121, 82, 216, 0.16);
 }
 
 .expectations-input-suffix input,
 .expectations-input-prefix input {
-  height: 34px;
+  height: 40px;
   border: 0;
   border-radius: 0;
   background: transparent;
@@ -1901,33 +1966,34 @@
 }
 
 .expectations-input-suffix > span {
-  padding-right: 9px;
-  color: #898397;
-  font-size: 8px;
-  font-weight: 450;
+  padding-right: 11px;
+  color: #625875;
+  font-size: 10px;
+  font-weight: 550;
 }
 
 .expectations-input-prefix > span {
-  padding-left: 10px;
-  color: #6b568f;
-  font-size: 10px;
+  padding-left: 12px;
+  color: #6242a4;
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .expectations-remote-field {
   grid-column: 1 / -1;
-  padding: 10px;
+  padding: 13px 14px;
   display: flex;
   align-items: flex-start;
-  gap: 9px;
-  border: 1px solid #ebe6f2;
-  border-radius: 8px;
-  background: #faf8fd;
+  gap: 11px;
+  border: 1px solid #dcd0f0;
+  border-radius: 9px;
+  background: #f2edfb;
   cursor: pointer;
 }
 
 .expectations-remote-field > input {
-  width: 14px;
-  height: 14px;
+  width: 17px;
+  height: 17px;
   margin: 1px 0 0;
   accent-color: #6846c1;
 }
@@ -1938,25 +2004,34 @@
 }
 
 .expectations-remote-field strong {
-  color: #4f4a60;
-  font-size: 9px;
-  font-weight: 650;
+  color: #382951;
+  font-size: 11px;
+  font-weight: 700;
 }
 
 .expectations-remote-field small {
-  margin-top: 2px;
-  color: #898397;
-  font-size: 8px;
+  margin-top: 3px;
+  color: #665c78;
+  font-size: 10px;
+  line-height: 1.45;
 }
 
 .expectations-form-error,
 .expectations-form-success {
   margin: 0;
-  font-size: 9px;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.expectations-form-error {
+  padding: 10px 12px;
+  border: 1px solid #efc9ce;
+  border-radius: 8px;
+  background: #fff5f5;
 }
 
 .expectations-form-success {
-  color: #3e7958;
+  color: #276641;
 }
 
 .expectations-form-actions {
@@ -1966,13 +2041,18 @@
 }
 
 .expectations-form-actions button {
-  min-height: 33px;
-  padding: 0 11px;
-  border-radius: 7px;
+  min-height: 40px;
+  padding: 0 16px;
+  border-radius: 8px;
   font: inherit;
-  font-size: 9px;
-  font-weight: 650;
+  font-size: 11px;
+  font-weight: 700;
   cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease, transform 150ms ease;
+}
+
+.expectations-form-actions button:hover:not(:disabled) {
+  transform: translateY(-1px);
 }
 
 .expectations-form-actions button:disabled {
@@ -1981,19 +2061,21 @@
 }
 
 .expectations-cancel-button {
-  border: 1px solid #e1dce9;
+  border: 1px solid #d8d2e2;
   background: #fff;
-  color: #6e687c;
+  color: #514a61;
 }
 
 .expectations-save-button {
-  border: 1px solid #5b3b9e;
-  background: #6241aa;
+  border: 1px solid #553494;
+  background: #6240aa;
   color: #fff;
+  box-shadow: 0 4px 10px rgba(80, 49, 143, 0.18);
 }
 
 .expectations-save-button:hover:not(:disabled) {
-  background: #4f328f;
+  border-color: #45257f;
+  background: #4e2e91;
 }
 
 .expectations-form-message {

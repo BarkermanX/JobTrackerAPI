@@ -62,7 +62,12 @@ function Login() {
           <div className="artwork-orbit artwork-orbit-three" />
 
           <div className="artwork-brand">
-            <span className="brand-mark" aria-hidden="true">J</span>
+            <span className="brand-mark" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <rect x="3.5" y="8" width="17" height="12" rx="2" />
+                <path d="M8.5 8V6.5A1.5 1.5 0 0 1 10 5h4a1.5 1.5 0 0 1 1.5 1.5V8M3.5 12h17m-11 3 1.8 1.8L15.5 14" />
+              </svg>
+            </span>
             <span>Job Tracker</span>
           </div>
 

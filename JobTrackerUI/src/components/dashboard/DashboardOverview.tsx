@@ -183,7 +183,12 @@ function DashboardOverview({ username }: DashboardOverviewProps) {
         >
           <div className="card-heading">
             <div className="card-title-wrap">
-              <span className="card-icon card-icon-lilac" aria-hidden="true">◎</span>
+              <span className="card-icon card-icon-lilac" aria-hidden="true">
+                <svg className="expectations-icon" viewBox="0 0 24 24" focusable="false">
+                  <path d="M12 2.75 14.4 4l2.7-.1 1.1 2.5 2.2 1.6-.7 2.6.7 2.6-2.2 1.6-1.1 2.5-2.7-.1-2.4 1.25L9.6 17l-2.7.1-1.1-2.5-2.2-1.6.7-2.6-.7-2.6 2.2-1.6 1.1-2.5 2.7.1z" />
+                  <path d="m8.5 10.7 2.2 2.2 4.8-4.8" />
+                </svg>
+              </span>
               <div><h2>Job expectations</h2><p>What matters in your next role</p></div>
             </div>
             <div className="card-heading-actions">
@@ -280,7 +285,11 @@ function DashboardOverview({ username }: DashboardOverviewProps) {
         <article className="dashboard-card" id="considering">
           <div className="card-heading">
             <div className="card-title-wrap">
-              <span className="card-icon card-icon-peach" aria-hidden="true">◇</span>
+              <span className="card-icon card-icon-peach" aria-hidden="true">
+                <svg className="saved-role-icon" viewBox="0 0 24 24" focusable="false">
+                  <path d="M6.5 3.5h11a1 1 0 0 1 1 1v16l-6.5-4.2-6.5 4.2v-16a1 1 0 0 1 1-1z" />
+                </svg>
+              </span>
               <div><h2>Jobs considering</h2><p>Interesting roles to explore</p></div>
             </div>
             <span className="section-count">0 saved</span>
@@ -295,7 +304,13 @@ function DashboardOverview({ username }: DashboardOverviewProps) {
         <article className="dashboard-card" id="follow-ups">
           <div className="card-heading">
             <div className="card-title-wrap">
-              <span className="card-icon card-icon-blue" aria-hidden="true">◷</span>
+              <span className="card-icon card-icon-blue" aria-hidden="true">
+                <svg className="conversation-icon" viewBox="0 0 24 24" focusable="false">
+                  <circle cx="8.5" cy="8" r="3" />
+                  <circle cx="16.5" cy="9" r="2.5" />
+                  <path d="M3.5 19v-1a5 5 0 0 1 10 0v1zM14 14a4.2 4.2 0 0 1 6.5 3.5v.5h-5" />
+                </svg>
+              </span>
               <div><h2>Interviews & follow-ups</h2><p>Stay ready for your next conversation</p></div>
             </div>
             <span className="coming-soon">PLANNER</span>

@@ -142,6 +142,17 @@
   font-weight: 700;
 }
 
+.brand-mark svg,
+.dashboard-brand-mark svg {
+  width: 21px;
+  height: 21px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+}
+
 .artwork-copy {
   max-width: 450px;
   margin-top: auto;
